@@ -48,7 +48,7 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
       const Y = d.getFullYear();
       const M = String(d.getMonth() + 1).padStart(2, "0");
       const D = String(d.getDate()).padStart(2, "0");
-      const isoDate = ${Y}-${M}-${D};
+      const isoDate = `${Y}-${M}-${D}`;
       const label = DAY_LABELS[i];
 
       const items = routines.filter((r) => r.date === isoDate);
@@ -122,12 +122,12 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
     <div className="grid grid-cols-3 gap-4">
       {charts.map(([label, key, type]) => (
         <div key={key} className="space-y-1">
-          <h4 className="text-center font-medium">{주간 ${label}}</h4>
+          <h4 className="text-center font-medium">{`주간 ${label}`}</h4>
           <div className="w-full h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
                 <XAxis dataKey="name" />
-                <YAxis domain={type === "percent" ? [0, 100] : [0, 10]} />
+                <YAxis domain={type === "score" ? [0, 10] : [0, 100]} />
                 <Tooltip />
                 <Bar dataKey={key} fill="#8884d8" />
               </BarChart>
