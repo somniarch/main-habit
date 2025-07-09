@@ -33,29 +33,24 @@ interface Props {
 
 export default function WeeklySummary({ routines, currentDate }: Props) {
   const weeklyData = useMemo(() => {
-    // 1) currentDate를 로컬 기준 자정으로 파싱
     const [yy, mm, dd] = currentDate.split("-").map(Number);
     const today = new Date(yy, mm - 1, dd);
-    
-    // 2) 이번 주 월요일로 이동
-    const jsDay = today.getDay();            // 0=일…6=토
-    const monOffset = (jsDay + 6) % 7;        // 월=0…일=6
+
+    const jsDay = today.getDay();
+    const monOffset = (jsDay + 6) % 7;
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - monOffset);
 
-    // 3) 7일치(월→일) 배열 생성
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(weekStart);
       d.setDate(weekStart.getDate() + i);
 
-      // ISO 문자열과, x축에 표시할 레이블
       const Y = d.getFullYear();
       const M = String(d.getMonth() + 1).padStart(2, "0");
       const D = String(d.getDate()).padStart(2, "0");
-      const isoDate = `${Y}-${M}-${D}`;       // "2025-07-07"
-      const label = DAY_LABELS[i];            // "월","화",…
+      const isoDate = `${Y}-${M}-${D}`;
+      const label = DAY_LABELS[i];
 
-      // 이 날짜에 **설정된** 루틴/습관만 필터링
       const items = routines.filter((r) => r.date === isoDate);
       const total = items.length;
       const doneCount = items.filter((r) => r.done).length;
@@ -102,7 +97,7 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
         : 0;
 
       return {
-        name: label,                 // x축: "월" 등
+        name: label,
         totalCompletion,
         totalSatisfaction,
         routineCompletion,
@@ -113,25 +108,26 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
     });
   }, [routines, currentDate]);
 
+  // [라벨, 데이터키, 타입]
   const charts = [
-    ["전체 달성률", "totalCompletion"],
-    ["루틴 달성률", "routineCompletion"],
-    ["습관 달성률", "habitCompletion"],
-    ["전체 만족도", "totalSatisfaction"],
-    ["루틴 만족도", "routineSatisfaction"],
-    ["습관 만족도", "habitSatisfaction"],
+    ["전체 달성률", "totalCompletion", "percent"],
+    ["루틴 달성률", "routineCompletion", "percent"],
+    ["습관 달성률", "habitCompletion", "percent"],
+    ["전체 만족도", "totalSatisfaction", "score"],
+    ["루틴 만족도", "routineSatisfaction", "score"],
+    ["습관 만족도", "habitSatisfaction", "score"],
   ] as const;
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {charts.map(([label, key]) => (
+      {charts.map(([label, key, type]) => (
         <div key={key} className="space-y-1">
           <h4 className="text-center font-medium">{`주간 ${label}`}</h4>
           <div className="w-full h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
                 <XAxis dataKey="name" />
-                <YAxis domain={[0, 100]} />
+                <YAxis domain={type === "percent" ? [0, 100] : [0, 10]} />
                 <Tooltip />
                 <Bar dataKey={key} fill="#8884d8" />
               </BarChart>
