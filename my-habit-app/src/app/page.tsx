@@ -17,10 +17,7 @@ type Routine = {
 const habitCandidates = ["깊은 숨 2분", "물 한잔", "짧은 산책", "스트레칭"];
 const fullDays = ["월", "화", "수", "목", "금", "토", "일"];
 const dayLetters = fullDays.map((d) => d[0]);
-// U+2028(U8232), U+2029(U8233) 특수문자 제거 함수
-function safeString(str) {
-  return typeof str === "string" ? str.replace(/[\u2028\u2029]/g, "") : str;
-}
+
 function getEncouragementAndHabit(task: string) {
   const lower = task.toLowerCase();
   if (lower.includes("study") || lower.includes("read")) {
@@ -370,10 +367,7 @@ const handleExportCSV = () => {
     const res = await fetch("/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-       prevTask: safeString(prevTask),
-       nextTask: safeString(nextTask),
- }),
+      body: JSON.stringify({ prevTask, nextTask }),
     });
 
     // 먼저 HTTP 상태 체크
@@ -432,7 +426,7 @@ async function generateSummaryAI(_day: string, _tasks: string[]): Promise<string
     const res = await fetch("/api/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: safeString(prompt) }),
+      body: JSON.stringify({ prompt }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -462,7 +456,7 @@ The drawing should evoke quiet satisfaction and mindfulness.
     const res = await fetch("/openai/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: safeString(prompt) }),
+      body: JSON.stringify({ prompt }),
     });
     const data = await res.json();
     if (!res.ok) {
