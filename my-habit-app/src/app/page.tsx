@@ -373,7 +373,7 @@ const handleExportCSV = () => {
       body: JSON.stringify({
        prevTask: safeString(prevTask),
        nextTask: safeString(nextTask),
-+ }),
+ }),
     });
 
     // 먼저 HTTP 상태 체크
