@@ -48,6 +48,9 @@ export default function Page() {
   const [aiHabitLoading, setAiHabitLoading] = useState(false);
   const [aiHabitError, setAiHabitError] = useState<string | null>(null);
 
+  const [diaryLoading, setDiaryLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+
   // 번역된 요일 배열
   const translatedDays = getTranslatedDays(t);
   const dayLetters = translatedDays.map((d) => d[0]);
@@ -59,7 +62,7 @@ export default function Page() {
     }
   }, [todayDiaryLogs, userId]);
 
-  // AI 일기 생성
+  // AI 일기 생성 (로딩 상태 반영)
   useEffect(() => {
     (async () => {
       for (const day of fullDays) {
@@ -67,25 +70,28 @@ export default function Page() {
         const d = new Date(currentDate);
         d.setDate(currentDate.getDate() - currentDate.getDay() + (dayIdx + 1));
         const iso = d.toISOString().split("T")[0];
-
         const completed = routines
           .filter(r => r.date === iso && r.done)
           .map(r => r.task);
         const count = completed.length;
-
         if (count >= 5 && !generated5[day]) {
           setGenerated5(prev => ({ ...prev, [day]: true }));
+          setDiaryLoading(true);
           const summary = await generateSummaryAI(iso, completed, language);
           setDiarySummariesAI(prev => ({ ...prev, [iso]: summary }));
+          setDiaryLoading(false);
         } else if (count >= 10 && !generated10[day]) {
           setGenerated10(prev => ({ ...prev, [day]: true }));
+          setDiaryLoading(true);
           const summary = await generateSummaryAI(day, completed, language);
           setDiarySummariesAI(prev => ({ ...prev, [day]: summary }));
+          setDiaryLoading(false);
         }
       }
     })();
   }, [routines, todayDiaryLogs, generated5, generated10, currentDate, language]);
 
+  // 그림 생성 로딩 상태도 필요하다면 비슷하게 setImageLoading 사용
 
 
   const handleLogout = () => {
@@ -385,17 +391,20 @@ export default function Page() {
                 const d = new Date(currentDate);
                 d.setDate(currentDate.getDate() - currentDate.getDay() + (dayIdx + 1));
                 const iso = d.toISOString().split("T")[0];
-              
                 const completedTasks = routines
                   .filter(r => r.date === iso && r.done)
                   .map(r => r.task);
-                
                 if (completedTasks.length === 0) return null;
                 if (completedTasks.length < 5) return null;
-                
+                // 로딩 상태 분리 (예시: diaryLoading, imageLoading)
+                if (diaryLoading) {
+                  return <div className="text-center text-lg">{language === 'en' ? 'Writing diary summary ... 📝' : '일기 요약 작성중입니다 ... 📝'}</div>;
+                }
+                if (imageLoading) {
+                  return <div className="text-center text-lg">{language === 'en' ? 'Drawing diary image ... 🖼️' : '일기 그림 그리는 중입니다 ... 🖼️'}</div>;
+                }
                 const diaryDateStr = `${iso}(${selectedDay})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);
-                
                 return (
                   <div key={selectedDay} className="mb-6">
                     <h3 className="font-semibold">{diaryDateStr}</h3>

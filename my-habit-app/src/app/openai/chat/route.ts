@@ -123,9 +123,8 @@ export async function POST(request: NextRequest) {
 
       // 원본 AI 응답
       const raw = completion.choices[0]?.message?.content ?? "";
-      // "**오늘의 일기**" 헤더와 뒤따르는 줄바꿈 제거
-      const withoutHeader = raw.replace(/^\*\*오늘의 일기\*\*\s*\r?\n?/i, "");
-      // 앞뒤 공백 정리
+      // 불필요한 헤더/줄바꿈 제거 (영어/한국어 모두)
+      const withoutHeader = raw.replace(/^\*\*오늘의 일기\*\*\s*\r?\n?/i, "").replace(/^\*\*Today\'s Diary\*\*\s*\r?\n?/i, "");
       const summary = withoutHeader.trim();
       console.log("[API] Diary summary response:", summary);
 
@@ -140,41 +139,6 @@ export async function POST(request: NextRequest) {
         }
       );
     }
-
-    // POST handler 안
-if (prompt && !prevTask && !nextTask) {
-  console.log("[API] Diary summary mode");
-  const diaryPrompt = `다음은 사용자의 오늘 달성한 습관 및 일과 목록입니다:
-${prompt}
-
-이 중 특히 의미 있었던 순간과 그때 느낀 감정을 간결하게 담아,
-사용자의 노력을 진심으로 칭찬하며 따뜻하고 생동감 있는 일기 형식으로 4줄 이내로 짧게 요약해 주세요.
-추가적으로, 문장의 끝이 모두 마무리 되도록 써주세요.`;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: "따뜻하고 구체적인 일기 요약을 작성하는 전문가입니다." },
-      { role: "user", content: diaryPrompt }
-    ],
-    temperature: 0.7,
-    max_tokens: 200
-  });
-
-  const summary = completion.choices[0]?.message?.content?.trim() ?? "";
-  console.log("[API] Diary summary response:", summary);
-
-  return new NextResponse(
-    JSON.stringify({ success: true, result: summary }),
-    {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "application/json; charset=utf-8"
-      }
-    }
-  );
-}
 
     // 2) 습관 추천 분기: prevTask와 nextTask가 모두 있을 때만
     if (!prevTask || !nextTask) {

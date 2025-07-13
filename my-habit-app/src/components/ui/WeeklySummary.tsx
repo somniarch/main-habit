@@ -61,7 +61,8 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
       const isoDate = `${Y}-${M}-${D}`;
       const label = t(DAY_LABEL_KEYS[i]);
 
-      const items = routines.filter((r) => r.date === isoDate);
+      // 루틴의 date(행동 실제 날짜)만을 기준으로 집계 (이미 date로만 필터링, 주석 명확화)
+      const items = routines.filter((r) => r.date === isoDate); // date가 행동 실제 날짜
       const total = items.length;
       const doneCount = items.filter((r) => r.done).length;
       const totalCompletion = total
