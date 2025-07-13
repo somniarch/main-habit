@@ -228,46 +228,61 @@ ${prompt}
           .replace(/^[-*]\s*/, "")          // 불릿 제거
           .trim()
       )
+      // 완화된 필터: N분/분(min) 포함 + 이모지 포함된 줄만 우선 추출
       .filter(line => {
         if (selectedLanguage === 'en') {
-          // 영어: 'Nmin activity' + 이모지
-          return /^\d+min\s[a-zA-Z ]+.*$/u.test(line);
+          return /\d+min/.test(line) && /\p{Emoji}/u.test(line);
         } else {
-          // 한글: 'N분 활동' + 이모지
-          return /^\d+분\s[가-힣]+.*$/u.test(line);
+          return /\d+분/.test(line) && /\p{Emoji}/u.test(line);
         }
       });
 
-    // 2) 12자(영어는 12자, 한글은 12글자) 이하만 남기기
+    // 이모지 없는 항목엔 반드시 이모지 부여 (N분/분(min) 포함된 줄만)
+    if (suggestions.length < 3) {
+      const emojiMap = getEmojiMap(selectedLanguage);
+      const emojiRegex = /\p{Emoji}/u;
+      // 원본에서 N분/분(min) 포함된 줄만 추출해서 이모지 붙이기
+      const fallback = text.split(/\r?\n+/)
+        .map(line => line.replace(/^\s*\d+[\.\)]\s*/, "").replace(/^[-*]\s*/, "").trim())
+        .filter(line => {
+          if (selectedLanguage === 'en') {
+            return /\d+min/.test(line);
+          } else {
+            return /\d+분/.test(line);
+          }
+        })
+        .map(item => {
+          if (emojiRegex.test(item)) return item;
+          for (const [key, emoji] of Object.entries(emojiMap)) {
+            if (key !== 'default' && item.toLowerCase().includes(key.toLowerCase())) {
+              return `${item}${emoji}`;
+            }
+          }
+          return `${item}${emojiMap.default}`;
+        });
+      // 중복 없이 추가
+      for (const f of fallback) {
+        if (!suggestions.includes(f)) suggestions.push(f);
+        if (suggestions.length >= 3) break;
+      }
+    }
+
+    // 12자 이하 필터는 완화(최대 16자까지 허용)
     suggestions = suggestions.filter(line => {
       if (selectedLanguage === 'en') {
-        // 영어는 공백 포함 12자 이하
-        return line.replace(/\s/g, '').length <= 12;
+        return line.replace(/\s/g, '').length <= 16;
       } else {
-        // 한글은 공백 포함 12글자 이하
-        return line.replace(/\s/g, '').length <= 12;
+        return line.replace(/\s/g, '').length <= 16;
       }
     });
 
-    // 3) 이모지 없는 항목엔 반드시 이모지 부여
-    const emojiMap = getEmojiMap(selectedLanguage);
-    const emojiRegex = /\p{Emoji}/u;
-    const finalSuggestions = suggestions.map(item => {
-      if (emojiRegex.test(item)) return item;
-      for (const [key, emoji] of Object.entries(emojiMap)) {
-        if (key !== 'default' && item.toLowerCase().includes(key.toLowerCase())) {
-          return `${item}${emoji}`;
-        }
-      }
-      return `${item}${emojiMap.default}`;
-    });
-
-    // 4) 3~5개만 반환(미만이면 기본 후보 추가)
-    const result = finalSuggestions.slice(0, 5);
+    // 3~5개만 반환(미만이면 기본 후보 추가)
+    const result = suggestions.slice(0, 5);
     if (result.length < 3) {
       const defaults = getDefaultHabits(selectedLanguage);
+      const emojiMap = getEmojiMap(selectedLanguage);
+      const emojiRegex = /\p{Emoji}/u;
       for (let i = 0; i < defaults.length && result.length < 3; i++) {
-        // 이모지 붙이기
         let d = defaults[i];
         if (!emojiRegex.test(d)) {
           for (const [key, emoji] of Object.entries(emojiMap)) {
