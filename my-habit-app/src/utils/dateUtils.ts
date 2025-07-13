@@ -48,7 +48,7 @@ export function getDayIndex(selectedDay: string): number {
   return fullDays.indexOf(selectedDay);
 }
 
-export function getRealDate(currentDate: Date, selectedDay: string): string {
+export function getRealDate(currentDate: Date, _selectedDay: string): string {
   // 요일 기준이 아닌 실제 날짜 기준으로 수정
   // 선택한 날짜가 그대로 해당 날짜의 행동으로 저장됨
   // currentDate를 그대로 사용하여 요일 계산을 하지 않음
