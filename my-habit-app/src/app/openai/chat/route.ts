@@ -3,6 +3,15 @@ import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// 유니코드 특수문자 제거 함수
+function sanitizeText(text: string): string {
+  return text
+    .replace(/[\u2028\u2029\uFFFE\uFFFF]/g, '') // 유니코드 특수문자 제거
+    .replace(/\r\n/g, '\n') // Windows 줄바꿈을 Unix 줄바꿈으로 통일
+    .replace(/\r/g, '\n') // Mac 줄바꿈을 Unix 줄바꿈으로 통일
+    .trim();
+}
+
 // Vercel에서 Node.js runtime 사용
 export const runtime = "nodejs";
 
@@ -75,8 +84,9 @@ export async function POST(request: NextRequest) {
     // 일기 요약 분기: prompt만 있을 때
     if (prompt && !prevTask && !nextTask) {
       console.log("[API] Diary summary mode");
+      const sanitizedPrompt = sanitizeText(prompt);
       const diaryPrompt = `다음은 사용자의 오늘 달성한 습관 및 일과 목록입니다:
-${prompt}
+${sanitizedPrompt}
 
 이 중 특히 의미 있었던 순간과 그때 느낀 감정을 간결하게 담아,
 사용자의 노력을 진심으로 칭찬하며 따뜻하고 생동감 있는 일기 형식으로 짧게 요약해 주세요.`;
@@ -160,7 +170,9 @@ ${prompt}
     console.log("[API] Habit recommendation mode. Context:", prevTask, nextTask);
 
     // 조합된 컨텍스트 생성
-    const context = [prevTask, nextTask].filter(Boolean).join(", ");
+    const sanitizedPrevTask = prevTask ? sanitizeText(prevTask) : "";
+    const sanitizedNextTask = nextTask ? sanitizeText(nextTask) : "";
+    const context = [sanitizedPrevTask, sanitizedNextTask].filter(Boolean).join(", ");
     const habitPrompt = `사용자의 이전 행동과 다음 행동: ${context}
 이 행동들 사이에 자연스럽게 연결할 수 있는 짧은 웰빙 습관을
 1) 형식: N분(1~5분) + 활동 + 이모지
