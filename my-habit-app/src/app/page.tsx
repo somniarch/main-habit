@@ -446,8 +446,8 @@ export default function Page() {
                 
                 // 요약이 있으면 자동으로 그림 생성
                 if (summary && summary !== warmSummary(completedTasks)) {
-                  // 그림 자동 생성
-                  useEffect(() => {
+                  // 그림 자동 생성 로직을 별도 함수로 분리
+                  const generateImageIfNeeded = () => {
                     if (summary && !generatedImages[iso] && !imageLoading) {
                       setImageLoading(true);
                       generateImageAI(summary, tasksForImage)
@@ -464,7 +464,12 @@ export default function Page() {
                           setImageLoading(false);
                         });
                     }
-                  }, [summary, tasksForImage, iso]);
+                  };
+                  
+                  // 컴포넌트 렌더링 시 한 번만 실행
+                  if (!generatedImages[iso] && !imageLoading) {
+                    generateImageIfNeeded();
+                  }
                   
                   return (
                     <div key={selectedDay} className="mb-6">
