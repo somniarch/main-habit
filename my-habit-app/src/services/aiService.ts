@@ -3,7 +3,7 @@ export async function fetchHabitSuggestions(
   nextTask: string | null
 ): Promise<string[]> {
   try {
-    const res = await fetch("/openai/chat", {
+    const res = await fetch("/api/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prevTask, nextTask }),
@@ -17,7 +17,7 @@ export async function fetchHabitSuggestions(
     const data = await res.json();
     console.log("[fetchHabitSuggestions] JSON response:", data);
 
-    if (!data.result || !Array.isArray(data.result)) {
+    if (!data.success || !data.result || !Array.isArray(data.result)) {
       throw new Error("추천 결과 포맷이 올바르지 않습니다.");
     }
 
@@ -71,7 +71,7 @@ The drawing should evoke quiet satisfaction and mindfulness.
 🎯 Focus on: ${promptBase}
 📝 Activities today: ${activities}
 `;
-    const res = await fetch("/openai/generate-image", {
+    const res = await fetch("/api/openai/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
