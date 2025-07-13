@@ -215,11 +215,12 @@ export async function POST(request: NextRequest) {
       const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
       const hasMin = minPattern.test(line);
       const hasEmoji = emojiRegex.test(line);
-      const withinLength = line.replace(/\s/g, '').length <= 16;
+      const withinLength = line.replace(/\s/g, '').length <= 20; // 16자 → 20자로 증가
       
       console.log(`[Habit API] Filtering "${line}":`, { hasMin, hasEmoji, withinLength });
       
-      return hasMin && withinLength; // 이모지는 선택적으로 허용
+      // 매우 유연한 조건: N분 패턴이 있거나, 이모지가 있거나, 적당한 길이면 허용
+      return (hasMin || hasEmoji || line.length <= 15) && withinLength;
     });
 
     console.log("[Habit API] After filtering:", filteredSuggestions);
@@ -228,10 +229,11 @@ export async function POST(request: NextRequest) {
     if (filteredSuggestions.length < 3) {
       const emojiMap = getEmojiMap(selectedLanguage);
       const emojiRegex = /\p{Emoji}/u;
+      const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
       const fallback = suggestions
         .filter(line => {
           const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
-          return minPattern.test(line) && line.replace(/\s/g, '').length <= 16;
+          return (minPattern.test(line) || line.length <= 15) && line.replace(/\s/g, '').length <= 20; // 더 유연한 조건
         })
         .map(item => {
           if (emojiRegex.test(item)) return item;
@@ -247,7 +249,7 @@ export async function POST(request: NextRequest) {
       
       for (const f of fallback) {
         if (!filteredSuggestions.includes(f)) filteredSuggestions.push(f);
-        if (filteredSuggestions.length >= 3) break;
+        if (filteredSuggestions.length >= 5) break; // 3개 → 5개로 증가
       }
     }
 
@@ -257,7 +259,7 @@ export async function POST(request: NextRequest) {
       const defaults = getDefaultHabits(selectedLanguage);
       const emojiMap = getEmojiMap(selectedLanguage);
       const emojiRegex = /\p{Emoji}/u;
-      for (let i = 0; i < defaults.length && result.length < 3; i++) {
+      for (let i = 0; i < defaults.length && result.length < 5; i++) { // 3개 → 5개로 증가
         let d = defaults[i];
         if (!emojiRegex.test(d)) {
           for (const [key, emoji] of Object.entries(emojiMap)) {
@@ -268,9 +270,9 @@ export async function POST(request: NextRequest) {
           }
           if (!emojiRegex.test(d)) d = `${d}${emojiMap.default}`;
         }
-        // 5분 이내+16자 이내만
+        // 5분 이내+20자 이내만 (16자 → 20자로 증가)
         const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
-        if (minPattern.test(d) && d.replace(/\s/g, '').length <= 16 && !result.includes(d)) result.push(d);
+        if (minPattern.test(d) && d.replace(/\s/g, '').length <= 20 && !result.includes(d)) result.push(d);
       }
     }
 

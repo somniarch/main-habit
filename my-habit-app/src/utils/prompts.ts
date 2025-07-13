@@ -30,7 +30,14 @@ ${tasks}
 1분 물마시기💧
 4분 산책🚶‍♀️`
     },
-    defaultHabits: ["3분 스트레칭💪", "2분 명상🧘‍♂️", "1분 물마시기💧"],
+    defaultHabits: [
+      "3min stretching💪", "2min meditation🧘‍♂️", "1min water💧", "4min walking🚶‍♀️", "3min music🎶", 
+      "2min breathing🌬️", "1min organizing🧹", "3min yoga🧘‍♀️", "2min meditation🧘", "1min stretching💪", 
+      "3min walking🚶", "2min water💧", "1min music🎶", "4min yoga🧘‍♀️", "3min breathing🌬️",
+      "2min organizing🧹", "1min meditation🧘‍♂️", "3min water💧", "2min stretching💪", "1min walking🚶‍♀️",
+      "4min music🎶", "3min organizing🧹", "2min yoga🧘‍♀️", "1min breathing🌬️", "3min meditation🧘‍♂️",
+      "2min water💧", "1min stretching💪", "4min walking🚶", "3min music🎶", "2min organizing🧹"
+    ],
     emojiMap: {
       '걷기': '🚶‍♀️',
       '숨쉬기': '🌬️',
@@ -70,7 +77,14 @@ Please suggest wellness habits that can naturally connect between these activiti
 1min water💧
 4min walking🚶‍♀️`
     },
-    defaultHabits: ["3min stretching💪", "2min meditation🧘‍♂️", "1min water💧"],
+    defaultHabits: [
+      "3min stretching💪", "2min meditation🧘‍♂️", "1min water💧", "4min walking🚶‍♀️", "3min music🎶", 
+      "2min breathing🌬️", "1min organizing🧹", "3min yoga🧘‍♀️", "2min meditation🧘", "1min stretching💪", 
+      "3min walking🚶", "2min water💧", "1min music🎶", "4min yoga🧘‍♀️", "3min breathing🌬️",
+      "2min organizing🧹", "1min meditation🧘‍♂️", "3min water💧", "2min stretching💪", "1min walking🚶‍♀️",
+      "4min music🎶", "3min organizing🧹", "2min yoga🧘‍♀️", "1min breathing🌬️", "3min meditation🧘‍♂️",
+      "2min water💧", "1min stretching💪", "4min walking🚶", "3min music🎶", "2min organizing🧹"
+    ],
     emojiMap: {
       'walking': '🚶‍♀️',
       'breathing': '🌬️',
