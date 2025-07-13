@@ -67,9 +67,11 @@ Gentle, muted colors like orange, yellow, brown, and green.
 The composition should feel peaceful and heartwarming, like a moment captured in a personal journal.
 No humans should appear in the image.
 The drawing should evoke quiet satisfaction and mindfulness.
+Focus on the most satisfying and meaningful activities from the user's day.
 
 🎯 Focus on: ${promptBase}
-📝 Activities today: ${activities}
+📝 High satisfaction activities today: ${activities}
+✨ Create an image that captures the joy and fulfillment from these activities
 `;
     const res = await fetch("/api/openai/generate-image", {
       method: "POST",

@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRoutines } from "@/hooks/useRoutines";
 import { formatWeekLabel, formatMonthDay, fullDays, getTranslatedDays } from "@/utils/dateUtils";
 import { getEncouragementAndHabit, warmSummary, habitCandidates } from "@/utils/encouragementUtils";
-import { fetchHabitSuggestions, generateSummaryAI } from "@/services/aiService";
+import { fetchHabitSuggestions, generateSummaryAI, generateImageAI } from "@/services/aiService";
 import { TabType, DiaryLogs, DiarySummaries, GeneratedFlags } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/ui/LanguageSelector";
@@ -80,7 +80,18 @@ export default function Page() {
           console.log(`[Diary] Generating summary for ${day} (5+ tasks)`);
           setGenerated5(prev => ({ ...prev, [day]: true }));
           setDiaryLoading(true);
-          const summary = await generateSummaryAI(iso, completed, language);
+          
+          // 만족도 상위 50% 이내의 행동들을 우선 선택
+          const highSatisfactionTasks = routines
+            .filter(r => r.date === iso && r.done && r.rating >= 5) // 만족도 5점 이상
+            .sort((a, b) => b.rating - a.rating) // 만족도 높은 순으로 정렬
+            .slice(0, Math.ceil(count * 0.5)) // 상위 50%
+            .map(r => r.task);
+          
+          const tasksForSummary = highSatisfactionTasks.length > 0 ? highSatisfactionTasks : completed;
+          console.log(`[Diary] High satisfaction tasks for ${day}:`, tasksForSummary);
+          
+          const summary = await generateSummaryAI(iso, tasksForSummary, language);
           console.log(`[Diary] Summary for ${day}:`, summary);
           setDiarySummariesAI(prev => ({ ...prev, [iso]: summary }));
           setDiaryLoading(false);
@@ -88,7 +99,18 @@ export default function Page() {
           console.log(`[Diary] Generating summary for ${day} (10+ tasks)`);
           setGenerated10(prev => ({ ...prev, [day]: true }));
           setDiaryLoading(true);
-          const summary = await generateSummaryAI(day, completed, language);
+          
+          // 만족도 상위 50% 이내의 행동들을 우선 선택
+          const highSatisfactionTasks = routines
+            .filter(r => r.date === day && r.done && r.rating >= 5) // 만족도 5점 이상
+            .sort((a, b) => b.rating - a.rating) // 만족도 높은 순으로 정렬
+            .slice(0, Math.ceil(count * 0.5)) // 상위 50%
+            .map(r => r.task);
+          
+          const tasksForSummary = highSatisfactionTasks.length > 0 ? highSatisfactionTasks : completed;
+          console.log(`[Diary] High satisfaction tasks for ${day}:`, tasksForSummary);
+          
+          const summary = await generateSummaryAI(day, tasksForSummary, language);
           console.log(`[Diary] Summary for ${day}:`, summary);
           setDiarySummariesAI(prev => ({ ...prev, [day]: summary }));
           setDiaryLoading(false);
@@ -402,6 +424,17 @@ export default function Page() {
                   .map(r => r.task);
                 if (completedTasks.length === 0) return null;
                 if (completedTasks.length < 5) return null;
+                
+                // 만족도 상위 50% 이내의 행동들을 우선 선택
+                const highSatisfactionRoutines = routines
+                  .filter(r => r.date === iso && r.done && r.rating >= 5) // 만족도 5점 이상
+                  .sort((a, b) => b.rating - a.rating) // 만족도 높은 순으로 정렬
+                  .slice(0, Math.ceil(completedTasks.length * 0.5)) // 상위 50%
+                  .map(r => r.task);
+                
+                const tasksForImage = highSatisfactionRoutines.length > 0 ? highSatisfactionRoutines : completedTasks;
+                console.log(`[Diary Display] High satisfaction tasks for image:`, tasksForImage);
+                
                 // 로딩 상태 분리 (예시: diaryLoading, imageLoading)
                 if (diaryLoading) {
                   return <div className="text-center text-lg">{language === 'en' ? 'Writing diary summary ... 📝' : '일기 요약 작성중입니다 ... 📝'}</div>;
@@ -412,6 +445,23 @@ export default function Page() {
                   <div key={selectedDay} className="mb-6">
                     <h3 className="font-semibold">{diaryDateStr}</h3>
                     <p className="mb-2 whitespace-pre-line">{summary}</p>
+                    {/* 그림 생성 버튼 추가 */}
+                    <button
+                      onClick={async () => {
+                        try {
+                          const imageUrl = await generateImageAI(summary, tasksForImage);
+                          if (imageUrl) {
+                            console.log(`[Diary] Generated image URL:`, imageUrl);
+                            // 이미지 표시 로직 추가 가능
+                          }
+                        } catch (error) {
+                          console.error(`[Diary] Image generation error:`, error);
+                        }
+                      }}
+                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      {language === 'en' ? 'Generate Image 🎨' : '그림 생성하기 🎨'}
+                    </button>
                   </div>
                 );
               })()}
