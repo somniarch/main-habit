@@ -176,10 +176,10 @@ ${prompt}
   );
 }
 
-    // 2) 습관 추천 분기: prevTask 또는 nextTask 있을 때
-    if (!prevTask && !nextTask) {
+    // 2) 습관 추천 분기: prevTask와 nextTask가 모두 있을 때만
+    if (!prevTask || !nextTask) {
       return new NextResponse(
-        JSON.stringify({ error: "No context provided (prevTask or nextTask required)" }),
+        JSON.stringify({ error: "이전 작업과 다음 작업이 모두 필요합니다 (prevTask, nextTask required)" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
@@ -204,13 +204,18 @@ ${prompt}
         sanitizedNextTask ? `다음: ${sanitizedNextTask}` : ""
       ].filter(Boolean).join(", ");
     }
-    const { system, user } = getPrompt(selectedLanguage, 'habit', context);
+    // 프롬프트를 더 명확하게 전달
+    const userPrompt =
+      selectedLanguage === 'en'
+        ? `${context}\nSuggest 3-5 wellness habits that can be done between these activities.\n- Format: Nmin + noun + emoji (e.g. 3min stretching💪)\n- Each habit must take 5 minutes or less.\n- Each must be a noun phrase with an emoji.\n- Each must be 16 characters or less.\n- Output as a plain list, no explanations.`
+        : `${context}\n이 두 행동 사이에 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사+이모지 형태여야 합니다.\n- 각 항목은 16자 이내여야 합니다.\n- 설명 없이 목록만 출력해 주세요.`;
+    const { system } = getPrompt(selectedLanguage, 'habit', context);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: system },
-        { role: "user", content: user }
+        { role: "user", content: userPrompt }
       ],
       temperature: 0.7,
       max_tokens: 200
@@ -219,7 +224,7 @@ ${prompt}
     const text = completion.choices[0]?.message?.content?.trim() ?? "";
     console.log("[Habit API] OpenAI raw response:", text);
 
-    // 1) 번호·불릿 제거, 언어별 패턴만 남기기
+    // 1) 번호·불릿 제거, 패턴 필터링
     let suggestions = text
       .split(/\r?\n+/)
       .map(line =>
@@ -228,29 +233,21 @@ ${prompt}
           .replace(/^[-*]\s*/, "")          // 불릿 제거
           .trim()
       )
-      // 완화된 필터: N분/분(min) 포함 + 이모지 포함된 줄만 우선 추출
+      // 엄격한 필터: N분(1~5분)+명사+이모지+16자 이내
       .filter(line => {
-        if (selectedLanguage === 'en') {
-          return /\d+min/.test(line) && /\p{Emoji}/u.test(line);
-        } else {
-          return /\d+분/.test(line) && /\p{Emoji}/u.test(line);
-        }
+        const emojiRegex = /\p{Emoji}/u;
+        const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min\s*[^\d]+\p{Emoji}/u : /^(1|2|3|4|5)분\s*[^\d]+\p{Emoji}/u;
+        return minPattern.test(line) && line.replace(/\s/g, '').length <= 16 && emojiRegex.test(line);
       });
 
-    // 이모지 없는 항목엔 반드시 이모지 부여 (N분/분(min) 포함된 줄만)
+    // 이모지 없는 항목은 자동 부여 (혹시라도 남아있을 경우)
     if (suggestions.length < 3) {
       const emojiMap = getEmojiMap(selectedLanguage);
       const emojiRegex = /\p{Emoji}/u;
-      // 원본에서 N분/분(min) 포함된 줄만 추출해서 이모지 붙이기
+      const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
       const fallback = text.split(/\r?\n+/)
         .map(line => line.replace(/^\s*\d+[\.\)]\s*/, "").replace(/^[-*]\s*/, "").trim())
-        .filter(line => {
-          if (selectedLanguage === 'en') {
-            return /\d+min/.test(line);
-          } else {
-            return /\d+분/.test(line);
-          }
-        })
+        .filter(line => minPattern.test(line) && line.replace(/\s/g, '').length <= 16)
         .map(item => {
           if (emojiRegex.test(item)) return item;
           for (const [key, emoji] of Object.entries(emojiMap)) {
@@ -260,21 +257,11 @@ ${prompt}
           }
           return `${item}${emojiMap.default}`;
         });
-      // 중복 없이 추가
       for (const f of fallback) {
         if (!suggestions.includes(f)) suggestions.push(f);
         if (suggestions.length >= 3) break;
       }
     }
-
-    // 12자 이하 필터는 완화(최대 16자까지 허용)
-    suggestions = suggestions.filter(line => {
-      if (selectedLanguage === 'en') {
-        return line.replace(/\s/g, '').length <= 16;
-      } else {
-        return line.replace(/\s/g, '').length <= 16;
-      }
-    });
 
     // 3~5개만 반환(미만이면 기본 후보 추가)
     const result = suggestions.slice(0, 5);
@@ -293,7 +280,9 @@ ${prompt}
           }
           if (!emojiRegex.test(d)) d = `${d}${emojiMap.default}`;
         }
-        if (!result.includes(d)) result.push(d);
+        // 5분 이내+16자 이내만
+        const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
+        if (minPattern.test(d) && d.replace(/\s/g, '').length <= 16 && !result.includes(d)) result.push(d);
       }
     }
 
