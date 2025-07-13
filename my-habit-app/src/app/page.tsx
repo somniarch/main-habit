@@ -225,12 +225,6 @@ export default function Page() {
             </div>
           </div>
 
-          {isAdmin && (
-            <button className="mb-4 px-4 py-2 bg-red-600 text-white rounded font-semibold">
-              {t('admin.panel')}
-            </button>
-          )}
-
           <div className="flex justify-center items-center gap-4">
             <button aria-label={t('nav.prev.week')} onClick={handlePrevWeek} className="px-3 py-1 text-lg font-bold">
               &lt;
