@@ -48,13 +48,16 @@ export function getDayIndex(selectedDay: string): number {
   return fullDays.indexOf(selectedDay);
 }
 
-export function getRealDate(currentDate: Date, _selectedDay: string): string {
-  // 요일 기준이 아닌 실제 날짜 기준으로 수정
-  // 선택한 날짜가 그대로 해당 날짜의 행동으로 저장됨
-  // currentDate를 그대로 사용하여 요일 계산을 하지 않음
+export function getRealDate(currentDate: Date, selectedDay: string): string {
+  // 요일 기준으로 수정
+  // 선택한 요일이 해당 주의 실제 날짜로 계산되어 저장됨
+  // 7/14 (월)의 루틴은 다른 날짜에서 체크해도 7/14 (월)에 저장됨
   
-  // 현재 날짜를 그대로 사용 (요일 계산 없음)
+  const dayIdx = getDayIndex(selectedDay);
   const realDate = new Date(currentDate);
+  
+  // 현재 주의 해당 요일로 계산
+  realDate.setDate(currentDate.getDate() - currentDate.getDay() + (dayIdx + 1));
   
   return realDate.toISOString().split("T")[0];
 }
