@@ -3,15 +3,25 @@ import OpenAI from "openai";
 import { getPrompt, getDefaultHabits, getEmojiMap } from "@/utils/prompts";
 import { Language } from "@/types";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// 유니코드 특수문자 제거 함수
-function sanitizeText(text: string): string {
-  return text
-    .replace(/[\u2028\u2029\uFFFE\uFFFF]/g, '') // 유니코드 특수문자 제거
-    .replace(/\r\n/g, '\n') // Windows 줄바꿈을 Unix 줄바꿈으로 통일
-    .replace(/\r/g, '\n') // Mac 줄바꿈을 Unix 줄바꿈으로 통일
+// 유니코드 특수문자 제거 함수 (더 강력한 버전)
+function sanitizeString(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029\u8232\u8233]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
+}
+
+// API 키 정리 (런타임에서 확인)
+const apiKey = sanitizeString(process.env.OPENAI_API_KEY || "");
+
+const openai = new OpenAI({ apiKey: apiKey });
+
+// 유니코드 특수문자 제거 함수 (기존 함수 개선)
+function sanitizeText(text: string): string {
+  return sanitizeString(text)
+    .replace(/\r\n/g, '\n') // Windows 줄바꿈을 Unix 줄바꿈으로 통일
+    .replace(/\r/g, '\n'); // Mac 줄바꿈을 Unix 줄바꿈으로 통일
 }
 
 // Vercel에서 Node.js runtime 사용
@@ -50,6 +60,17 @@ export async function GET() {
 // POST handler: 습관 추천 or 일기 요약 분기
 export async function POST(request: NextRequest) {
   try {
+    // API 키 확인
+    if (!apiKey) {
+      return new NextResponse(
+        JSON.stringify({ error: "OpenAI API 키가 설정되지 않았습니다." }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
+        }
+      );
+    }
+
     console.log("[API] POST request received");
 
     // Content-Type 확인

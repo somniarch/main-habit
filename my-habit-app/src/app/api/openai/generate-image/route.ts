@@ -1,12 +1,32 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+// 유니코드 특수문자 제거 함수 (더 강력한 버전)
+function sanitizeString(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029\u8232\u8233]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// API 키 정리 (런타임에서 확인)
+const apiKey = sanitizeString(process.env.OPENAI_API_KEY || "");
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: apiKey,
 });
 
 export async function POST(request: Request) {
   try {
+    // API 키 확인
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, message: "OpenAI API 키가 설정되지 않았습니다." },
+        { status: 500 }
+      );
+    }
+
     const { prompt } = await request.json();
 
     if (!prompt) {
@@ -17,10 +37,7 @@ export async function POST(request: Request) {
     }
 
     // 프롬프트 정리 (유니코드 문자 제거)
-    const cleanPrompt = prompt
-      .replace(/[\u2028\u2029\u8232]/g, ' ') // 유니코드 줄바꿈 문자 제거
-      .replace(/\s+/g, ' ') // 연속된 공백을 하나로
-      .trim();
+    const cleanPrompt = sanitizeString(prompt);
 
     const response = await openai.images.generate({
       model: "dall-e-3",
