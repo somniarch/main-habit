@@ -60,19 +60,29 @@ export async function generateSummaryAI(day: string, tasks: string[], language: 
 
 export async function generateImageAI(promptBase: string, tasks: string[]): Promise<string> {
   try {
+    // 프롬프트 길이 제한 (1000자 이내)
+    const maxPromptLength = 800; // 여유분 확보
+    const maxActivitiesLength = 200;
+    const maxBaseLength = 200;
+    
+    // promptBase와 activities 길이 제한
+    const truncatedPromptBase = promptBase.length > maxBaseLength 
+      ? promptBase.substring(0, maxBaseLength) + "..." 
+      : promptBase;
+    
     const activities = tasks.join(", ");
-    const prompt = `
-A warm, cozy colored pencil illustration with soft textures and subtle shading, resembling hand-drawn diary art.
-Gentle, muted colors like orange, yellow, brown, and green.
-The composition should feel peaceful and heartwarming, like a moment captured in a personal journal.
-No humans should appear in the image.
-The drawing should evoke quiet satisfaction and mindfulness.
-Focus on the most satisfying and meaningful activities from the user's day.
-
-🎯 Focus on: ${promptBase}
-📝 High satisfaction activities today: ${activities}
-✨ Create an image that captures the joy and fulfillment from these activities
-`;
+    const truncatedActivities = activities.length > maxActivitiesLength 
+      ? activities.substring(0, maxActivitiesLength) + "..." 
+      : activities;
+    
+    const prompt = `Warm colored pencil illustration, soft textures, muted colors (orange, yellow, brown, green). Peaceful journal art style, no humans. Focus on: ${truncatedPromptBase}. Activities: ${truncatedActivities}. Joyful and mindful atmosphere.`;
+    
+    // 최종 프롬프트 길이 확인
+    if (prompt.length > maxPromptLength) {
+      console.warn(`[Image AI] Prompt too long: ${prompt.length} chars, truncating...`);
+      const truncatedPrompt = prompt.substring(0, maxPromptLength);
+      console.log(`[Image AI] Final prompt length: ${truncatedPrompt.length} chars`);
+    }
     const res = await fetch("/api/openai/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

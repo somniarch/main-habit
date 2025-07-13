@@ -3,13 +3,23 @@ import { Language } from '@/types';
 export const prompts = {
   ko: {
     diary: {
-      system: "따뜻하고 구체적인 일기 요약을 작성하는 전문가입니다.",
+      system: "따뜻하고 구체적인 일기 요약을 작성하는 전문가입니다. 엄격한 형식 규칙을 따라 작성합니다.",
       user: (tasks: string) => `다음은 사용자의 오늘 달성한 습관 및 일과 목록입니다 (만족도 상위 50% 활동들):
 ${tasks}
 
 이 중 특히 의미 있었던 순간과 그때 느낀 감정을 간결하게 담아,
-사용자의 노력을 진심으로 칭찬하며 따뜻하고 생동감 있는 일기 형식으로 짧게 요약해 주세요.
-만족도가 높은 활동들을 중점적으로 다루어 사용자의 성취를 축하하는 내용으로 작성해 주세요.`
+사용자의 노력을 진심으로 칭찬하며 따뜻하고 생동감 있는 일기 형식으로 작성해 주세요.
+만족도가 높은 활동들을 중점적으로 다루어 사용자의 성취를 축하하는 내용으로 작성해 주세요.
+
+**엄격한 형식 규칙:**
+- 날짜나 시간 언급 금지 (오늘, 어제, 이번 주 등)
+- 최소 3문장, 최대 5문장으로 제한
+- 모든 문장은 완전한 끝맺음 (마침표, 느낌표, 물음표)
+- 따뜻하고 격려적인 톤 유지
+- 구체적인 감정과 경험을 담되 간결하게 작성
+
+**출력 예시:**
+스트레칭을 하면서 몸이 서서히 풀리는 느낌이 너무 좋았다. 운동 시간에는 땀을 흘리며 각별히 느껴지는 성취감이 있었다. 마지막으로 눈 운동을 하며 잠시나마 눈의 피로를 풀어주는 시간을 가졌다.`
     },
     habit: {
       system: "당신은 웰빙 습관 추천 전문가입니다. 앞뒤 행동을 분석하여 적절한 웰빙 습관을 추천합니다.",
@@ -51,13 +61,22 @@ ${tasks}
   },
   en: {
     diary: {
-      system: "You are an expert at writing warm and specific diary summaries.",
+      system: "You are an expert at writing warm and specific diary summaries. Follow strict format rules.",
       user: (tasks: string) => `Here are the user's completed habits and daily activities today (top 50% satisfaction activities):
 ${tasks}
 
 Please write a brief, warm and vivid diary entry that captures the meaningful moments and emotions felt, 
-sincerely praising the user's efforts. Focus on high-satisfaction activities to celebrate the user's achievements. 
-Keep it concise and engaging.`
+sincerely praising the user's efforts. Focus on high-satisfaction activities to celebrate the user's achievements.
+
+**Strict Format Rules:**
+- No date or time references (today, yesterday, this week, etc.)
+- Minimum 3 sentences, maximum 5 sentences
+- All sentences must have complete endings (period, exclamation, question mark)
+- Maintain warm and encouraging tone
+- Include specific emotions and experiences but keep it concise
+
+**Output Example:**
+Stretching felt amazing as my muscles gradually relaxed. During exercise, I felt a special sense of accomplishment while sweating. Finally, I took time to relieve eye fatigue with eye exercises.`
     },
     habit: {
       system: "You are a wellness habit recommendation expert. Analyze the context between activities and recommend appropriate wellness habits.",
