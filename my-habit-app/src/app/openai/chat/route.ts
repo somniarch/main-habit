@@ -108,8 +108,14 @@ export async function POST(request: NextRequest) {
     // 일기 요약 분기: prompt만 있을 때
     if (prompt && !prevTask && !nextTask) {
       console.log("[API] Diary summary mode");
+      console.log("[API] Prompt:", prompt);
+      console.log("[API] Language:", selectedLanguage);
+      
       const sanitizedPrompt = sanitizeText(prompt);
       const { system, user } = getPrompt(selectedLanguage, 'diary', sanitizedPrompt);
+      
+      console.log("[API] System prompt:", system);
+      console.log("[API] User prompt:", user);
 
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -123,6 +129,8 @@ export async function POST(request: NextRequest) {
 
       // 원본 AI 응답
       const raw = completion.choices[0]?.message?.content ?? "";
+      console.log("[API] Raw AI response:", raw);
+      
       // 불필요한 헤더/줄바꿈 제거 (영어/한국어 모두)
       const withoutHeader = raw.replace(/^\*\*오늘의 일기\*\*\s*\r?\n?/i, "").replace(/^\*\*Today\'s Diary\*\*\s*\r?\n?/i, "");
       const summary = withoutHeader.trim();
@@ -197,21 +205,35 @@ export async function POST(request: NextRequest) {
           .replace(/^[-*]\s*/, "")          // 불릿 제거
           .trim()
       )
-      // 엄격한 필터: N분(1~5분)+명사+이모지+16자 이내
-      .filter(line => {
-        const emojiRegex = /\p{Emoji}/u;
-        const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min\s*[^\d]+\p{Emoji}/u : /^(1|2|3|4|5)분\s*[^\d]+\p{Emoji}/u;
-        return minPattern.test(line) && line.replace(/\s/g, '').length <= 16 && emojiRegex.test(line);
-      });
+      .filter(line => line.length > 0); // 빈 줄 제거
+
+    console.log("[Habit API] After cleaning:", suggestions);
+
+    // 더 유연한 필터링: N분(1~5분) + 명사 + 이모지 (선택적)
+    const filteredSuggestions = suggestions.filter(line => {
+      const emojiRegex = /\p{Emoji}/u;
+      const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
+      const hasMin = minPattern.test(line);
+      const hasEmoji = emojiRegex.test(line);
+      const withinLength = line.replace(/\s/g, '').length <= 16;
+      
+      console.log(`[Habit API] Filtering "${line}":`, { hasMin, hasEmoji, withinLength });
+      
+      return hasMin && withinLength; // 이모지는 선택적으로 허용
+    });
+
+    console.log("[Habit API] After filtering:", filteredSuggestions);
 
     // 이모지 없는 항목은 자동 부여 (혹시라도 남아있을 경우)
-    if (suggestions.length < 3) {
+    if (filteredSuggestions.length < 3) {
       const emojiMap = getEmojiMap(selectedLanguage);
       const emojiRegex = /\p{Emoji}/u;
       const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
-      const fallback = text.split(/\r?\n+/)
-        .map(line => line.replace(/^\s*\d+[\.\)]\s*/, "").replace(/^[-*]\s*/, "").trim())
-        .filter(line => minPattern.test(line) && line.replace(/\s/g, '').length <= 16)
+      const fallback = suggestions
+        .filter(line => {
+          const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
+          return minPattern.test(line) && line.replace(/\s/g, '').length <= 16;
+        })
         .map(item => {
           if (emojiRegex.test(item)) return item;
           for (const [key, emoji] of Object.entries(emojiMap)) {
@@ -221,14 +243,17 @@ export async function POST(request: NextRequest) {
           }
           return `${item}${emojiMap.default}`;
         });
+      
+      console.log("[Habit API] Fallback suggestions:", fallback);
+      
       for (const f of fallback) {
-        if (!suggestions.includes(f)) suggestions.push(f);
-        if (suggestions.length >= 3) break;
+        if (!filteredSuggestions.includes(f)) filteredSuggestions.push(f);
+        if (filteredSuggestions.length >= 3) break;
       }
     }
 
     // 3~5개만 반환(미만이면 기본 후보 추가)
-    const result = suggestions.slice(0, 5);
+    const result = filteredSuggestions.slice(0, 5);
     if (result.length < 3) {
       const defaults = getDefaultHabits(selectedLanguage);
       const emojiMap = getEmojiMap(selectedLanguage);
@@ -249,6 +274,8 @@ export async function POST(request: NextRequest) {
         if (minPattern.test(d) && d.replace(/\s/g, '').length <= 16 && !result.includes(d)) result.push(d);
       }
     }
+
+    console.log("[Habit API] Final result:", result);
 
     // JSON 형태로 반환
     return new NextResponse(

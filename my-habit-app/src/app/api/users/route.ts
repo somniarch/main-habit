@@ -55,8 +55,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { adminUserId, newUser } = await request.json();
+    console.log("[Users API] POST request received:", { adminUserId, newUser: newUser?.userId });
 
     if (!adminUserId || !newUser) {
+      console.log("[Users API] Missing required data");
       return NextResponse.json(
         { success: false, message: "필수 데이터가 누락되었습니다." },
         { status: 400 }
@@ -68,7 +70,10 @@ export async function POST(request: Request) {
       select: { isAdmin: true }
     });
 
+    console.log("[Users API] Admin check:", { adminUserId, admin });
+
     if (!admin || !admin.isAdmin) {
+      console.log("[Users API] Admin permission denied:", { adminUserId, admin });
       return NextResponse.json(
         { success: false, message: "관리자 권한이 필요합니다." },
         { status: 403 }
@@ -81,6 +86,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
+      console.log("[Users API] User already exists:", newUser.userId);
       return NextResponse.json(
         { success: false, message: "이미 존재하는 사용자 ID입니다." },
         { status: 409 }
@@ -95,6 +101,8 @@ export async function POST(request: Request) {
       }
     });
 
+    console.log("[Users API] User created successfully:", user.userId);
+
     return NextResponse.json({ 
       success: true, 
       message: "사용자가 성공적으로 생성되었습니다.",
@@ -105,7 +113,7 @@ export async function POST(request: Request) {
       }
     });
   } catch (error) {
-    console.error("Create user error:", error);
+    console.error("[Users API] Create user error:", error);
     return NextResponse.json(
       { success: false, message: "서버 오류가 발생했습니다." },
       { status: 500 }

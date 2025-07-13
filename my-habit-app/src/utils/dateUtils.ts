@@ -49,9 +49,13 @@ export function getDayIndex(selectedDay: string): number {
 }
 
 export function getRealDate(currentDate: Date, selectedDay: string): string {
-  const dayIdx = getDayIndex(selectedDay);
+  // 요일 기준이 아닌 실제 날짜 기준으로 수정
+  // 선택한 날짜가 그대로 해당 날짜의 행동으로 저장됨
+  // currentDate를 그대로 사용하여 요일 계산을 하지 않음
+  
+  // 현재 날짜를 그대로 사용 (요일 계산 없음)
   const realDate = new Date(currentDate);
-  realDate.setDate(currentDate.getDate() - currentDate.getDay() + (dayIdx + 1));
+  
   return realDate.toISOString().split("T")[0];
 }
 
