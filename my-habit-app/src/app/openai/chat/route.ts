@@ -229,7 +229,6 @@ export async function POST(request: NextRequest) {
     if (filteredSuggestions.length < 3) {
       const emojiMap = getEmojiMap(selectedLanguage);
       const emojiRegex = /\p{Emoji}/u;
-      const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
       const fallback = suggestions
         .filter(line => {
           const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
