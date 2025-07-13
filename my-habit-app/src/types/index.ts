@@ -34,3 +34,11 @@ export type DiaryLogs = Record<string, string[]>;
 export type DiarySummaries = Record<string, string>;
 export type DiaryImages = Record<string, string>;
 export type GeneratedFlags = Record<string, boolean>; 
+
+export type Language = 'ko' | 'en';
+
+export interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+} 

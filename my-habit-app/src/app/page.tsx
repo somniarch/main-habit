@@ -12,11 +12,14 @@ import { formatWeekLabel, formatMonthDay, fullDays, getRealDate } from "@/utils/
 import { getEncouragementAndHabit, warmSummary, habitCandidates } from "@/utils/encouragementUtils";
 import { fetchHabitSuggestions, generateSummaryAI, generateImageAI } from "@/services/aiService";
 import { TabType, DiaryLogs, DiarySummaries, DiaryImages, GeneratedFlags } from "@/types";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/ui/LanguageSelector";
 
 const dayLetters = fullDays.map((d) => d[0]);
 
 export default function Page() {
   const { isLoggedIn, isAdmin, userId, login, logout } = useAuth();
+  const { t } = useLanguage();
   const [userDbId, setUserDbId] = useState<number | undefined>();
   
   const { 
@@ -214,19 +217,22 @@ export default function Page() {
         <LoginForm onLogin={handleLogin} />
       ) : (
         <>
-          <div className="flex justify-end gap-2">
-            <span className="text-sm text-gray-600">안녕하세요, {userId}님</span>
-            <button
-              onClick={handleLogout}
-              className="text-red-600 underline text-sm hover:text-red-800 transition"
-            >
-              로그아웃
-            </button>
+          <div className="flex justify-between items-center">
+            <LanguageSelector />
+            <div className="flex gap-2">
+              <span className="text-sm text-gray-600">{t('hello')} {userId}</span>
+              <button
+                onClick={handleLogout}
+                className="text-red-600 underline text-sm hover:text-red-800 transition"
+              >
+                {t('logout')}
+              </button>
+            </div>
           </div>
 
           {isAdmin && (
             <button className="mb-4 px-4 py-2 bg-red-600 text-white rounded font-semibold">
-              관리자 모드
+              {t('admin.panel')}
             </button>
           )}
 
@@ -264,7 +270,7 @@ export default function Page() {
                 selectedTab === "routine-habit" ? "bg-black text-white" : "bg-gray-300 text-black"
               }`}
             >
-              루틴 및 습관
+              {t('tab.routine')}
             </button>
             <button
               onClick={() => setSelectedTab("tracker")}
@@ -272,7 +278,7 @@ export default function Page() {
                 selectedTab === "tracker" ? "bg-black text-white" : "bg-gray-300 text-black"
               }`}
             >
-              통계
+              {t('tab.weekly')}
             </button>
             <button
               onClick={() => setSelectedTab("today-diary")}
@@ -280,7 +286,7 @@ export default function Page() {
                 selectedTab === "today-diary" ? "bg-black text-white" : "bg-gray-300 text-black"
               }`}
             >
-              오늘 일기
+              {t('tab.diary')}
             </button>
           </div>
 
@@ -321,7 +327,7 @@ export default function Page() {
           
           {selectedTab === "tracker" && (
             <div className="mt-6">
-              <h2 className="text-center font-semibold text-xl mb-4">통계</h2>
+              <h2 className="text-center font-semibold text-xl mb-4">{t('weekly.summary')}</h2>
               <WeeklySummary
                 routines={routines}
                 currentDate={currentDate.toISOString().split("T")[0]}
@@ -330,14 +336,14 @@ export default function Page() {
                 onClick={handleExportCSV}
                 className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
               >
-                모든 로그 CSV 다운로드
+                {t('export.csv')}
               </button>
             </div>
           )}
           
           {selectedTab === "today-diary" && (
             <div className="mt-4 space-y-6 max-h-[480px] overflow-y-auto border rounded p-4 bg-gray-50 pb-8">
-              <h2 className="text-center font-semibold text-xl mb-4">오늘 일기</h2>
+              <h2 className="text-center font-semibold text-xl mb-4">{t('diary.summary')}</h2>
               {(() => {
                 const dayIdx = fullDays.indexOf(selectedDay);
                 const d = new Date(currentDate);
