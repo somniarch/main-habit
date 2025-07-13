@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { initAdmins } from "@/types";
 
 // 루틴 조회
 export async function GET(request: Request) {
+  await initAdmins(); // 어드민 계정 자동 등록
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
@@ -50,6 +52,7 @@ export async function GET(request: Request) {
 
 // 루틴 생성
 export async function POST(request: Request) {
+  await initAdmins(); // 어드민 계정 자동 등록
   try {
     const { userId, routine } = await request.json();
 

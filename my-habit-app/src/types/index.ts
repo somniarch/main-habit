@@ -1,3 +1,22 @@
+import { prisma } from "@/lib/prisma";
+
+export async function initAdmins() {
+  const adminIds = (process.env.NEXT_PUBLIC_ADMIN_USER_ID || "").split(",").map(id => id.trim());
+  const adminPws = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "").split(",").map(pw => pw.trim());
+
+  for (let i = 0; i < adminIds.length; i++) {
+    const userId = adminIds[i];
+    const password = adminPws[i] || "";
+    if (!userId) continue;
+    const exists = await prisma.user.findUnique({ where: { userId } });
+    if (!exists) {
+      await prisma.user.create({
+        data: { userId, password, isAdmin: true }
+      });
+    }
+  }
+}
+
 export type Routine = {
   id?: number;
   date: string; 
