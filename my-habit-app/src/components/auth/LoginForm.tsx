@@ -16,9 +16,9 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       setLoginError(t('login.error.empty'));
       return;
     }
-    // 관리자 계정만 로그인 허용
-    const adminIds = process.env.NEXT_PUBLIC_ADMIN_USER_ID?.split(',').map(id => id.trim()) || [];
-    const adminPws = process.env.NEXT_PUBLIC_ADMIN_PASSWORD?.split(',').map(pw => pw.trim()) || [];
+    // 어드민 계정만 로그인 허용
+    const adminIds = (process.env.NEXT_PUBLIC_ADMIN_USER_ID || "").split(',').map(id => id.trim());
+    const adminPws = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "").split(',').map(pw => pw.trim());
     let isAdmin = false;
     for (let i = 0; i < adminIds.length; i++) {
       if (userId === adminIds[i] && userPw === adminPws[i]) {
@@ -30,7 +30,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       onLogin(userId, true);
       setLoginError("");
     } else {
-      setLoginError(t('login.error.admin'));
+      setLoginError("아이디 및 비밀번호가 틀렸습니다.");
     }
   };
 
