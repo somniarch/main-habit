@@ -10,13 +10,10 @@ export function LoginForm({ onLogin }: LoginFormProps) {
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [adminModeActive, setAdminModeActive] = useState(false);
   const [newUserId, setNewUserId] = useState("");
   const [newUserPw, setNewUserPw] = useState("");
   const [userAddError, setUserAddError] = useState("");
 
-  const adminId = "3333";
-  const adminPw = "8888";
   const storedUsersKey = "registeredUsers";
 
   const getRegisteredUsers = (): { id: string; pw: string }[] => {
@@ -40,15 +37,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       setLoginError(t('login.error.empty'));
       return;
     }
-    if (adminModeActive) {
-      if (userId === adminId && userPw === adminPw) {
-        onLogin(userId, true);
-        setLoginError("");
-      } else {
-        setLoginError(t('login.error.admin'));
-      }
-      return;
-    }
+    
     const users = getRegisteredUsers();
     const found = users.find((u) => u.id === userId && u.pw === userPw);
     if (found) {
@@ -94,19 +83,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         className="border rounded px-3 py-2 w-full"
       />
 
-      <div className="flex justify-between items-center mt-1">
-        <button
-          onClick={() => {
-            setAdminModeActive(!adminModeActive);
-            setLoginError("");
-            setUserId("");
-            setUserPw("");
-            setUserAddError("");
-          }}
-          className="text-sm text-blue-600 hover:underline"
-        >
-          {adminModeActive ? t('login.normal.mode') : t('login.admin.mode')}
-        </button>
+      <div className="flex justify-end">
         <button
           onClick={handleLogin}
           className="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition"

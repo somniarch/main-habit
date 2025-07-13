@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import WeeklySummary from "@/components/ui/WeeklySummary";
 import { Toast } from "@/components/ui/Toast";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { AdminLoginForm } from "@/components/auth/AdminLoginForm";
 import { RoutineForm } from "@/components/routine/RoutineForm";
 import { RoutineItem } from "@/components/routine/RoutineItem";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +18,7 @@ import { LanguageSelector } from "@/components/ui/LanguageSelector";
 export default function Page() {
   const { isLoggedIn, isAdmin, userId, login, logout } = useAuth();
   const { t, language } = useLanguage();
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   
   const { 
     routines, 
@@ -169,6 +171,16 @@ export default function Page() {
     setToast({ emoji: "✅", message: isAdmin ? t('message.admin.login.success') : t('message.login.success') });
   };
 
+  const handleAdminLogin = (userId: string, isAdmin: boolean) => {
+    login(userId, isAdmin);
+    setShowAdminLogin(false);
+    setToast({ emoji: "✅", message: t('message.admin.login.success') });
+  };
+
+  const handleBackToNormal = () => {
+    setShowAdminLogin(false);
+  };
+
   const handlePrevWeek = () => {
     setCurrentDate(new Date(currentDate.getTime() - 7 * 86400000));
   };
@@ -209,7 +221,21 @@ export default function Page() {
       {toast && <Toast emoji={toast.emoji} message={toast.message} onClose={() => setToast(null)} />}
 
       {!isLoggedIn ? (
-        <LoginForm onLogin={handleLogin} />
+        showAdminLogin ? (
+          <AdminLoginForm onAdminLogin={handleAdminLogin} onBackToNormal={handleBackToNormal} />
+        ) : (
+          <div>
+            <LoginForm onLogin={handleLogin} />
+            <div className="text-center mt-4">
+              <button
+                onClick={() => setShowAdminLogin(true)}
+                className="text-sm text-gray-600 hover:text-gray-800 underline"
+              >
+                관리자 로그인
+              </button>
+            </div>
+          </div>
+        )
       ) : (
         <>
           <div className="flex justify-between items-center">
