@@ -15,7 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/ui/LanguageSelector";
 
 export default function Page() {
-  const { isLoggedIn, isAdmin, userId, login, logout } = useAuth();
+  const { isLoggedIn, userId, login, logout } = useAuth();
   const { t, language } = useLanguage();
   
   const { 

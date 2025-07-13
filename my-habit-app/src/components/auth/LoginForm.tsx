@@ -20,18 +20,16 @@ export function LoginForm({ onLogin }: LoginFormProps) {
     const adminIds = (process.env.NEXT_PUBLIC_ADMIN_USER_ID || "").split(',').map(id => id.trim());
     const adminPws = (process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "").split(',').map(pw => pw.trim());
     let isAdmin = false;
-    let adminIdx = -1;
     for (let i = 0; i < adminIds.length; i++) {
       if (userId === adminIds[i] && userPw === adminPws[i]) {
         isAdmin = true;
-        adminIdx = i;
         break;
       }
     }
     if (isAdmin) {
       // DB에 userId가 없으면 자동 생성
       try {
-        const res = await fetch("/api/users", {
+        await fetch("/api/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
