@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Language } from '@/types';
 
 export function LanguageSelector() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);

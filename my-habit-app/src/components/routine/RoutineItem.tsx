@@ -1,10 +1,8 @@
 import React from "react";
 import { Routine } from "@/types";
-import { getEncouragementAndHabit } from "@/utils/encouragementUtils";
 
 interface RoutineItemProps {
   routine: Routine;
-  index: number;
   globalIndex: number;
   onToggleDone: (index: number) => void;
   onSetRating: (index: number, rating: number) => void;
@@ -19,7 +17,6 @@ interface RoutineItemProps {
 
 export function RoutineItem({
   routine,
-  index,
   globalIndex,
   onToggleDone,
   onSetRating,

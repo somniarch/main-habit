@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Routine, NewRoutine } from "@/types";
 import { getRealDate } from "@/utils/dateUtils";
-import { getEncouragementAndHabit } from "@/utils/encouragementUtils";
 
 export function useRoutines(userId: string, userDbId?: number) {
   const [routines, setRoutines] = useState<Routine[]>([]);
@@ -15,7 +14,7 @@ export function useRoutines(userId: string, userDbId?: number) {
   });
 
   // 루틴 조회
-  const fetchRoutines = async (date?: string) => {
+  const fetchRoutines = useCallback(async (date?: string) => {
     if (!userId) return;
     
     setLoading(true);
@@ -33,12 +32,12 @@ export function useRoutines(userId: string, userDbId?: number) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("루틴을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   // 루틴 추가
   const addRoutine = async (currentDate: Date, selectedDay: string) => {
@@ -72,7 +71,7 @@ export function useRoutines(userId: string, userDbId?: number) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("루틴 추가 중 오류가 발생했습니다.");
     }
   };
@@ -102,7 +101,7 @@ export function useRoutines(userId: string, userDbId?: number) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("상태 변경 중 오류가 발생했습니다.");
     }
   };
@@ -125,7 +124,7 @@ export function useRoutines(userId: string, userDbId?: number) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("평점 설정 중 오류가 발생했습니다.");
     }
   };
@@ -165,7 +164,7 @@ export function useRoutines(userId: string, userDbId?: number) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("습관 추가 중 오류가 발생했습니다.");
     }
   };
@@ -184,7 +183,7 @@ export function useRoutines(userId: string, userDbId?: number) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("루틴 삭제 중 오류가 발생했습니다.");
     }
   };
@@ -194,7 +193,7 @@ export function useRoutines(userId: string, userDbId?: number) {
     if (userId) {
       fetchRoutines();
     }
-  }, [userId]);
+  }, [userId, fetchRoutines]);
 
   return {
     routines,

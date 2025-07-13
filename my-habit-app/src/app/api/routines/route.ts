@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 // 루틴 조회
 export async function GET(request: Request) {
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const whereClause: any = { userId: user.id };
+    const whereClause: Prisma.RoutineWhereInput = { userId: user.id };
     if (date) {
       whereClause.date = date;
     }

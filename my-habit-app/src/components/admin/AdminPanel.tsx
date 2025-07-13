@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 interface User {
   id: number;
@@ -21,7 +21,7 @@ export function AdminPanel({ adminUserId }: AdminPanelProps) {
   const [newUser, setNewUser] = useState({ userId: "", password: "", isAdmin: false });
 
   // 사용자 목록 조회
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -34,12 +34,12 @@ export function AdminPanel({ adminUserId }: AdminPanelProps) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("사용자 목록을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [adminUserId]);
 
   // 새 사용자 생성
   const handleCreateUser = async () => {
@@ -64,7 +64,7 @@ export function AdminPanel({ adminUserId }: AdminPanelProps) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("사용자 생성 중 오류가 발생했습니다.");
     }
   };
@@ -86,14 +86,14 @@ export function AdminPanel({ adminUserId }: AdminPanelProps) {
       } else {
         setError(data.message);
       }
-    } catch (err) {
+    } catch {
       setError("사용자 삭제 중 오류가 발생했습니다.");
     }
   };
 
   useEffect(() => {
     fetchUsers();
-  }, [adminUserId]);
+  }, [adminUserId, fetchUsers]);
 
   return (
     <div className="space-y-6">

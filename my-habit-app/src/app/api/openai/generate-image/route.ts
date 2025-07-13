@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       quality: "standard",
     });
 
-    const imageUrl = response.data[0]?.url;
+    const imageUrl = Array.isArray(response.data) && response.data[0]?.url ? response.data[0].url : undefined;
 
     if (!imageUrl) {
       return NextResponse.json(

@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import Image from "next/image"; 
 import WeeklySummary from "@/components/ui/WeeklySummary";
 import { Toast } from "@/components/ui/Toast";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -8,10 +7,10 @@ import { RoutineForm } from "@/components/routine/RoutineForm";
 import { RoutineItem } from "@/components/routine/RoutineItem";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoutines } from "@/hooks/useRoutines";
-import { formatWeekLabel, formatMonthDay, fullDays, getRealDate } from "@/utils/dateUtils";
+import { formatWeekLabel, formatMonthDay, fullDays } from "@/utils/dateUtils";
 import { getEncouragementAndHabit, warmSummary, habitCandidates } from "@/utils/encouragementUtils";
-import { fetchHabitSuggestions, generateSummaryAI, generateImageAI } from "@/services/aiService";
-import { TabType, DiaryLogs, DiarySummaries, DiaryImages, GeneratedFlags } from "@/types";
+import { fetchHabitSuggestions, generateSummaryAI } from "@/services/aiService";
+import { TabType, DiaryLogs, DiarySummaries, GeneratedFlags } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/ui/LanguageSelector";
 
@@ -45,7 +44,6 @@ export default function Page() {
   });
 
   const [diarySummariesAI, setDiarySummariesAI] = useState<DiarySummaries>({});
-  const [diaryImagesAI, setDiaryImagesAI] = useState<DiaryImages>({});
   const [generated5, setGenerated5] = useState<GeneratedFlags>({});
   const [generated10, setGenerated10] = useState<GeneratedFlags>({});
 
@@ -85,7 +83,7 @@ export default function Page() {
         }
       }
     })();
-  }, [routines, todayDiaryLogs, generated5, generated10]);
+  }, [routines, todayDiaryLogs, generated5, generated10, currentDate, language]);
 
 
 
@@ -298,13 +296,12 @@ export default function Page() {
               <div className="mt-6 space-y-4">
                 {routines
                   .filter((r) => r.day === selectedDay)
-                  .map((routine, idx, arr) => {
+                  .map((routine) => {
                     const globalIdx = routines.indexOf(routine);
                     return (
                       <RoutineItem
-                        key={`${routine.task}-${idx}`}
+                        key={routine.id}
                         routine={routine}
-                        index={idx}
                         globalIndex={globalIdx}
                         onToggleDone={handleToggleDone}
                         onSetRating={handleSetRating}
@@ -354,26 +351,13 @@ export default function Page() {
                 if (completedTasks.length === 0) return null;
                 if (completedTasks.length < 5) return null;
                 
-                const idx = fullDays.indexOf(selectedDay);
                 const diaryDateStr = `${iso}(${selectedDay})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);
-                const imageUrl = diaryImagesAI[iso];
                 
                 return (
                   <div key={selectedDay} className="mb-6">
                     <h3 className="font-semibold">{diaryDateStr}</h3>
                     <p className="mb-2 whitespace-pre-line">{summary}</p>
-                    {imageUrl && (
-                      <div className="mt-2 w-full rounded overflow-hidden relative" style={{ aspectRatio: "4/3" }}>
-                        <Image
-                          src={imageUrl}
-                          alt="오늘의 다이어리 일러스트"
-                          fill
-                          style={{ objectFit: "cover" }}
-                          priority
-                        />
-                      </div>
-                    )}
                   </div>
                 );
               })()}
