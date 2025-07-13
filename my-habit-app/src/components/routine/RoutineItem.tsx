@@ -6,13 +6,6 @@ interface RoutineItemProps {
   globalIndex: number;
   onToggleDone: (index: number) => void;
   onSetRating: (index: number, rating: number) => void;
-  onShowHabitSuggestions: (index: number) => void;
-  habitSuggestionIdx: number | null;
-  aiHabitSuggestions: string[];
-  aiHabitLoading: boolean;
-  aiHabitError: string | null;
-  onAddHabitBetween: (index: number, habit: string) => void;
-  onCloseHabitSuggestions: () => void;
 }
 
 export function RoutineItem({
@@ -20,13 +13,6 @@ export function RoutineItem({
   globalIndex,
   onToggleDone,
   onSetRating,
-  onShowHabitSuggestions,
-  habitSuggestionIdx,
-  aiHabitSuggestions,
-  aiHabitLoading,
-  aiHabitError,
-  onAddHabitBetween,
-  onCloseHabitSuggestions,
 }: RoutineItemProps) {
   return (
     <React.Fragment>
@@ -56,48 +42,6 @@ export function RoutineItem({
               {n + 1}
             </button>
           ))}
-        </div>
-      )}
-      {habitSuggestionIdx === globalIndex && (
-        <div className="p-3 bg-blue-50 rounded space-y-2 relative">
-          <button
-            onClick={onCloseHabitSuggestions}
-            className="absolute top-1 right-1 px-2 py-0.5 rounded hover:bg-gray-300"
-            aria-label="습관 추천 닫기"
-          >
-            ✕
-          </button>
-          {aiHabitLoading ? (
-            <p>추천 생성 중...</p>
-          ) : aiHabitError ? (
-            <p className="text-red-600">{aiHabitError}</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {aiHabitSuggestions.map((habit, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    onAddHabitBetween(globalIndex, habit);
-                    onCloseHabitSuggestions();
-                  }}
-                  className="rounded-full bg-gray-300 px-3 py-1 hover:bg-gray-400"
-                >
-                  {habit}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {habitSuggestionIdx !== globalIndex && (
-        <div className="text-center my-2">
-          <button
-            onClick={() => onShowHabitSuggestions(globalIndex)}
-            className="rounded-full bg-gray-300 px-3 py-1 hover:bg-gray-400"
-            aria-label="습관 추천 열기"
-          >
-            + 습관 추천
-          </button>
         </div>
       )}
     </React.Fragment>

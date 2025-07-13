@@ -33,7 +33,7 @@ export default function Page() {
   const [selectedDay, setSelectedDay] = useState(fullDays[0]);
   const [selectedTab, setSelectedTab] = useState<TabType>("routine-habit");
 
-  const [habitSuggestionIdx, setHabitSuggestionIdx] = useState<number | null>(null);
+  const [habitSuggestionIdx, setHabitSuggestionIdx] = useState<number | string | null>(null);
   const [todayDiaryLogs, setTodayDiaryLogs] = useState<DiaryLogs>(() => {
     if (typeof window === "undefined" || !userId) return {};
     const saved = localStorage.getItem(`todayDiaryLogs_${userId}`);
@@ -128,7 +128,7 @@ export default function Page() {
     await setRating(routineId, rating);
   };
 
-  const handleFetchHabitSuggestions = async (routineId: number) => {
+  const handleFetchHabitSuggestions = async (routineId: number | string) => {
     if (!isLoggedIn) {
       alert(t('login.required'));
       return;
@@ -152,7 +152,7 @@ export default function Page() {
     }
   };
 
-  const handleAddHabitBetween = async (routineId: number, habit: string) => {
+  const handleAddHabitBetween = async (routineId: number | string, habit: string) => {
     const routineIndex = routines.findIndex(r => r.id === routineId);
     await addHabitBetween(routineIndex, habit, currentDate, selectedDay);
     setHabitSuggestionIdx(null);
@@ -293,27 +293,70 @@ export default function Page() {
               />
 
               <div className="mt-6 space-y-4">
-                {routines
-                  .filter((r) => r.day === selectedDay)
-                  .map((routine) => {
-                    const globalIdx = routines.indexOf(routine);
-                    return (
+                {(() => {
+                  const routinesOfDay = routines.filter((r) => r.day === selectedDay);
+                  const items: React.ReactNode[] = [];
+                  for (let i = 0; i < routinesOfDay.length; i++) {
+                    const routine = routinesOfDay[i];
+                    const routineKey = routine.id !== undefined ? routine.id : i;
+                    items.push(
                       <RoutineItem
-                        key={routine.id}
+                        key={routineKey}
                         routine={routine}
-                        globalIndex={globalIdx}
+                        globalIndex={routineKey}
                         onToggleDone={handleToggleDone}
                         onSetRating={handleSetRating}
-                        onShowHabitSuggestions={handleFetchHabitSuggestions}
-                        habitSuggestionIdx={habitSuggestionIdx}
-                        aiHabitSuggestions={aiHabitSuggestions}
-                        aiHabitLoading={aiHabitLoading}
-                        aiHabitError={aiHabitError}
-                        onAddHabitBetween={handleAddHabitBetween}
-                        onCloseHabitSuggestions={handleCloseHabitSuggestions}
                       />
                     );
-                  })}
+                    // 루틴 사이(마지막 전까지만)에만 버튼/추천 UI
+                    if (i < routinesOfDay.length - 1) {
+                      items.push(
+                        <div key={`habit-btn-${i}`} className="text-center my-2">
+                          {habitSuggestionIdx === routineKey ? (
+                            <div className="p-3 bg-blue-50 rounded space-y-2 relative">
+                              <button
+                                onClick={handleCloseHabitSuggestions}
+                                className="absolute top-1 right-1 px-2 py-0.5 rounded hover:bg-gray-300"
+                                aria-label="습관 추천 닫기"
+                              >
+                                ✕
+                              </button>
+                              {aiHabitLoading ? (
+                                <p>추천 생성 중...</p>
+                              ) : aiHabitError ? (
+                                <p className="text-red-600">{aiHabitError}</p>
+                              ) : (
+                                <div className="flex flex-wrap gap-2">
+                                  {aiHabitSuggestions.map((habit, idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => {
+                                        handleAddHabitBetween(routineKey, habit);
+                                        handleCloseHabitSuggestions();
+                                      }}
+                                      className="rounded-full bg-gray-300 px-3 py-1 hover:bg-gray-400"
+                                    >
+                                      {habit}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleFetchHabitSuggestions(routineKey)}
+                              className="rounded-full bg-gray-300 px-3 py-1 hover:bg-gray-400"
+                              aria-label="습관 추천 열기"
+                            >
+                              + 습관 추천
+                            </button>
+                          )}
+                        </div>
+                      );
+                    }
+                  }
+                  return items;
+                })()}
               </div>
             </div>
           )}
