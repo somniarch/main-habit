@@ -166,6 +166,11 @@ export default function Page() {
 
   const handleLogin = (userId: string, isAdmin: boolean) => {
     login(userId, isAdmin);
+    // 로그인 시 오늘 날짜/요일로 이동
+    const today = new Date();
+    setCurrentDate(today);
+    const todayIdx = today.getDay() - 1; // 일요일=0, 월=1...
+    setSelectedDay(fullDays[todayIdx >= 0 ? todayIdx : 6]);
     setToast({ emoji: "✅", message: isAdmin ? t('message.admin.login.success') : t('message.login.success') });
   };
 

@@ -65,17 +65,19 @@ export async function POST(request: Request) {
       select: { id: true }
     });
 
+    let userIdNum = user?.id;
     if (!user) {
-      return NextResponse.json(
-        { success: false, message: "사용자를 찾을 수 없습니다." },
-        { status: 404 }
-      );
+      // 자동 생성
+      const newUser = await prisma.user.create({
+        data: { userId, password: "", isAdmin: true }
+      });
+      userIdNum = newUser.id;
     }
 
     const newRoutine = await prisma.routine.create({
       data: {
         ...routine,
-        userId: user.id
+        userId: userIdNum
       }
     });
 
