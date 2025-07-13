@@ -9,20 +9,29 @@ export async function POST(request: Request) {
   try {
     const { prevTask, nextTask } = await request.json();
 
+    // 유니코드 특수문자 제거 함수
+    function cleanText(text: string) {
+      return (text || "")
+        .replace(/[\u2028\u2029\u8232]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     // 프롬프트 정리 (유니코드 문자 제거)
-    const cleanPrompt = `이전 작업: ${prevTask || "없음"}
+    const cleanPrompt = cleanText(`이전 작업: ${prevTask || "없음"}
 다음 작업: ${nextTask || "없음"}
 
 위 두 작업 사이에 수행할 수 있는 짧고 실용적인 습관을 3-5개 추천해주세요.
 답변은 배열 형태로만 해주세요. 예시:
-["깊은 숨 2분", "물 한잔", "짧은 산책"]`;
+["깊은 숨 2분", "물 한잔", "짧은 산책"]`);
+    const cleanSystem = cleanText("당신은 습관 추천 전문가입니다. 짧고 실용적인 습관만 추천해주세요.");
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "당신은 습관 추천 전문가입니다. 짧고 실용적인 습관만 추천해주세요."
+          content: cleanSystem
         },
         {
           role: "user",
