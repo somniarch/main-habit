@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Habit App
 
-## Getting Started
+습관과 루틴을 관리하는 웹 애플리케이션입니다.
 
-First, run the development server:
+## 🚀 주요 기능
 
+- **루틴 관리**: 일일 루틴과 습관을 추가하고 관리
+- **진행률 추적**: 완료 상태와 만족도 평가
+- **AI 습관 추천**: 인공지능이 개인화된 습관을 추천
+- **통계 분석**: 주간 통계와 달성률 시각화
+- **AI 일기**: 완료된 활동을 바탕으로 한 AI 생성 일기
+- **사용자 관리**: 관리자가 사용자 계정을 생성하고 관리
+
+## 🛠 기술 스택
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Backend**: Next.js API Routes
+- **Database**: PostgreSQL (Prisma ORM)
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
+- **AI**: OpenAI API
+
+## 📦 설치 및 실행
+
+### 로컬 개발
+
+1. **저장소 클론**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd my-habit-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **의존성 설치**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **환경 변수 설정**
+```bash
+cp .env.example .env.local
+```
+`.env.local` 파일을 편집하여 필요한 환경 변수를 설정하세요:
+```
+DATABASE_URL="postgresql://username:password@localhost:5432/habit_app"
+OPENAI_API_KEY="your-openai-api-key"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **데이터베이스 설정**
+```bash
+npx prisma generate
+npx prisma db push
+```
 
-## Learn More
+5. **개발 서버 실행**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Vercel 배포
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Vercel CLI 설치**
+```bash
+npm i -g vercel
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Vercel 프로젝트 연결**
+```bash
+vercel
+```
 
-## Deploy on Vercel
+3. **환경 변수 설정**
+Vercel 대시보드에서 다음 환경 변수를 설정하세요:
+- `DATABASE_URL`: PostgreSQL 데이터베이스 URL
+- `OPENAI_API_KEY`: OpenAI API 키
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **데이터베이스 마이그레이션**
+```bash
+vercel env pull .env.local
+npx prisma db push
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🗄 데이터베이스 스키마
+
+### Users
+- 사용자 계정 정보
+- 관리자 권한 관리
+
+### Routines
+- 루틴 및 습관 데이터
+- 완료 상태 및 만족도
+- 사용자별 데이터 분리
+
+### Diaries
+- AI 생성 일기 데이터
+- 요약 및 이미지 URL
+
+## 🔐 보안
+
+- 사용자별 데이터 분리
+- 관리자 권한 검증
+- API 엔드포인트 보안
+
+## 📱 사용법
+
+### 일반 사용자
+1. 관리자가 제공한 계정으로 로그인
+2. 루틴 및 습관 추가
+3. 완료 상태 체크 및 만족도 평가
+4. 통계 및 일기 확인
+
+### 관리자
+1. 관리자 계정으로 로그인
+2. 새 사용자 계정 생성
+3. 사용자 목록 관리
+4. 시스템 모니터링
+
+## 🚀 배포 체크리스트
+
+- [ ] PostgreSQL 데이터베이스 설정
+- [ ] 환경 변수 구성
+- [ ] Prisma 마이그레이션 실행
+- [ ] OpenAI API 키 설정
+- [ ] Vercel 프로젝트 연결
+- [ ] 도메인 설정 (선택사항)
+
+## 📞 지원
+
+문제가 발생하거나 질문이 있으시면 이슈를 생성해 주세요.

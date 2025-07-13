@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -8,22 +8,46 @@ generator client {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  userId   String @unique
-  password String
-  routines Routine[]
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique
+  password  String
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  routines  Routine[]
+  diaries   Diary[]
 }
 
 model Routine {
   id       Int     @id @default(autoincrement())
-  date     String
-  day      String
-  start    String
-  end      String
+  date     String  // YYYY-MM-DD 형식
+  day      String  // 월, 화, 수, 목, 금, 토, 일
+  start    String  // HH:MM 형식
+  end      String  // HH:MM 형식
   task     String
-  done     Boolean
-  rating   Int
+  done     Boolean @default(false)
+  rating   Int     @default(0)
   isHabit  Boolean @default(false)
   userId   Int
-  user     User    @relation(fields: [userId], references: [id])
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([userId, day])
+}
+
+model Diary {
+  id        Int      @id @default(autoincrement())
+  date      String   // YYYY-MM-DD 형식
+  day       String   // 월, 화, 수, 목, 금, 토, 일
+  summary   String?  // AI 생성 요약
+  imageUrl  String?  // AI 생성 이미지 URL
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }
