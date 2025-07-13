@@ -12,8 +12,8 @@ export async function POST(request: Request) {
     }
 
     // 환경변수에서 관리자 계정들 확인
-    const adminUserIds = process.env.ADMIN_USER_ID?.split(',').map(id => id.trim()) || [];
-    const adminPasswords = process.env.ADMIN_PASSWORD?.split(',').map(pwd => pwd.trim()) || [];
+    const adminUserIds = process.env.NEXT_PUBLIC_ADMIN_USER_ID?.split(',').map(id => id.trim()) || [];
+    const adminPasswords = process.env.NEXT_PUBLIC_ADMIN_PASSWORD?.split(',').map(pwd => pwd.trim()) || [];
 
     if (adminUserIds.length === 0 || adminPasswords.length === 0) {
       console.error("관리자 환경변수가 설정되지 않았습니다.");
