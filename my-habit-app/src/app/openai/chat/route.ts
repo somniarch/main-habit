@@ -176,11 +176,11 @@ export async function POST(request: NextRequest) {
         sanitizedNextTask ? `다음: ${sanitizedNextTask}` : ""
       ].filter(Boolean).join(", ");
     }
-    // 프롬프트를 더 명확하게 전달
+    // 프롬프트를 더 명확하게 전달 - 엄격한 형식 규칙 적용
     const userPrompt =
       selectedLanguage === 'en'
-        ? `${context}\nSuggest 3-5 wellness habits that can be done between these activities.\n- Format: Nmin + noun + emoji (e.g. 3min stretching💪)\n- Each habit must take 5 minutes or less.\n- Each must be a noun phrase with an emoji.\n- Each must be 16 characters or less.\n- Output as a plain list, no explanations.`
-        : `${context}\n이 두 행동 사이에 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사형+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사형으로 작성해 주세요.\n- 관련된 이모지를 포함해 주세요.\n- 설명 없이 목록만 출력해 주세요.`;
+        ? `${context}\nSuggest 3-5 wellness habits that can be done between these activities.\n- Format: Nmin + noun + emoji (e.g. 3min stretching💪)\n- Each habit must take 5 minutes or less.\n- Each must be a noun phrase with an emoji.\n- Each must be 16 characters or less.\n- Output as a plain list, no explanations.\n- Strictly follow the format: Nmin + noun + emoji`
+        : `${context}\n이 두 행동 사이에 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사형+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사형으로 작성해 주세요.\n- 관련된 이모지를 포함해 주세요.\n- 설명 없이 목록만 출력해 주세요.\n- 엄격히 다음 형식을 지켜주세요: N분+명사형+이모지`;
     const { system } = getPrompt(selectedLanguage, 'habit', context);
 
     const completion = await openai.chat.completions.create({

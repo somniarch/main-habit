@@ -48,12 +48,12 @@ export async function POST(request: NextRequest) {
 
     const { prompt, language = 'ko', activities = [] } = await request.json();
 
-    // 언어별 프롬프트 생성
+    // 언어별 프롬프트 생성 - 따뜻한 칭찬과 만족도 상위 행동 중점
     let finalPrompt = '';
     if (language === 'en') {
-      finalPrompt = `A warm, cozy colored pencil illustration with soft textures and subtle shading, resembling hand-drawn diary art.\nGentle, muted colors like orange, yellow, brown, and green.\nThe composition should feel peaceful and heartwarming, like a moment captured in a personal journal.\nNo humans should appear in the image.\nThe drawing should evoke quiet satisfaction and mindfulness.\n\nFocus on: ${prompt}\nActivities today: ${activities.join(', ')}`;
+      finalPrompt = `A warm, cozy colored pencil illustration with soft textures and subtle shading, resembling hand-drawn diary art.\nGentle, muted colors like orange, yellow, brown, and green.\nThe composition should feel peaceful and heartwarming, like a moment captured in a personal journal.\nNo humans should appear in the image.\nThe drawing should evoke quiet satisfaction and mindfulness.\nFocus on activities that brought the most satisfaction (top 50% satisfaction level).\nCreate an image that celebrates and praises the user's achievements with warmth and encouragement.\n\nFocus on: ${prompt}\nActivities today: ${activities.join(', ')}`;
     } else {
-      finalPrompt = `따뜻하고 포근한 색연필 느낌의 일러스트, 부드러운 질감과 은은한 명암, 손그림 일기 느낌.\n오렌지, 노랑, 갈색, 연두 등 부드러운 색상.\n구성은 평화롭고 마음이 따뜻해지는, 일기장에 기록된 한 장면처럼.\n사람은 등장하지 않음.\n그림은 조용한 만족감과 마음챙김을 느끼게 해야 함.\n\n중점: ${prompt}\n오늘의 활동: ${activities.join(', ')}`;
+      finalPrompt = `따뜻하고 포근한 색연필 느낌의 일러스트, 부드러운 질감과 은은한 명암, 손그림 일기 느낌.\n오렌지, 노랑, 갈색, 연두 등 부드러운 색상.\n구성은 평화롭고 마음이 따뜻해지는, 일기장에 기록된 한 장면처럼.\n사람은 등장하지 않음.\n그림은 조용한 만족감과 마음챙김을 느끼게 해야 함.\n만족도 상위 50%에 드는 활동들을 중점으로 표현.\n사용자의 성취를 따뜻하게 칭찬하고 격려하는 이미지로 제작.\n\n중점: ${prompt}\n오늘의 활동: ${activities.join(', ')}`;
     }
 
     const cleanPrompt = sanitizeString(finalPrompt);

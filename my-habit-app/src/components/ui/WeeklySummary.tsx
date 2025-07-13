@@ -63,7 +63,7 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
       const isoDate = `${Y}-${M}-${D}`;
       const label = t(DAY_LABEL_KEYS[i]);
 
-      // 루틴의 date(행동 실제 날짜)만을 기준으로 집계 (이미 date로만 필터링, 주석 명확화)
+      // 루틴의 date(행동 실제 날짜)만을 기준으로 집계 - 달성 직후 실시간 반영
       const items = routines.filter((r) => r.date === isoDate); // date가 행동 실제 날짜
       const total = items.length;
       const doneCount = items.filter((r) => r.done).length;
@@ -121,7 +121,7 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
         habitSatisfaction,
       };
     });
-  }, [routines, currentDate, t]);
+  }, [routines, currentDate, t]); // routines 변경 시 즉시 통계 업데이트
 
   // [라벨, 데이터키, 타입] → 번역 키 사용
   const charts = [
