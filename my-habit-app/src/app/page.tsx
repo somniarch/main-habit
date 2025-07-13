@@ -19,7 +19,7 @@ const dayLetters = fullDays.map((d) => d[0]);
 
 export default function Page() {
   const { isLoggedIn, isAdmin, userId, login, logout } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [userDbId, setUserDbId] = useState<number | undefined>();
   
   const { 
@@ -77,11 +77,11 @@ export default function Page() {
 
         if (count >= 5 && !generated5[day]) {
           setGenerated5(prev => ({ ...prev, [day]: true }));
-          const summary = await generateSummaryAI(iso, completed);
+          const summary = await generateSummaryAI(iso, completed, language);
           setDiarySummariesAI(prev => ({ ...prev, [iso]: summary }));
         } else if (count >= 10 && !generated10[day]) {
           setGenerated10(prev => ({ ...prev, [day]: true }));
-          const summary = await generateSummaryAI(day, completed);
+          const summary = await generateSummaryAI(day, completed, language);
           setDiarySummariesAI(prev => ({ ...prev, [day]: summary }));
         }
       }
@@ -143,7 +143,7 @@ export default function Page() {
       const routineIndex = routines.findIndex(r => r.id === routineId);
       const prevTask = routineIndex > 0 ? routines[routineIndex - 1].task : null;
       const nextTask = routineIndex < routines.length - 1 ? routines[routineIndex + 1].task : null;
-      const suggestions = await fetchHabitSuggestions(prevTask, nextTask);
+      const suggestions = await fetchHabitSuggestions(prevTask, nextTask, language);
       setAiHabitSuggestions(suggestions);
       setHabitSuggestionIdx(routineId);
     } catch (error) {

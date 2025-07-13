@@ -1,12 +1,13 @@
 export async function fetchHabitSuggestions(
   prevTask: string | null,
-  nextTask: string | null
+  nextTask: string | null,
+  language: string = 'ko'
 ): Promise<string[]> {
   try {
     const res = await fetch("/api/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prevTask, nextTask }),
+      body: JSON.stringify({ prevTask, nextTask, language }),
     });
 
     if (!res.ok) {
@@ -38,13 +39,12 @@ export async function fetchHabitSuggestions(
   }
 }
 
-export async function generateSummaryAI(day: string, tasks: string[]): Promise<string> {
+export async function generateSummaryAI(day: string, tasks: string[], language: string = 'ko'): Promise<string> {
   try {
-    const prompt = `다음은 사용자의 오늘 달성한 습관 및 일과 목록입니다:\n${tasks.join(", ")}\n이 내용을 바탕으로 따뜻하고 긍정적인 응원의 메시지와 함께 짧게 요약해 주세요.`;
     const res = await fetch("/api/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt: tasks.join(", "), language }),
     });
     const data = await res.json();
     if (!res.ok) {
