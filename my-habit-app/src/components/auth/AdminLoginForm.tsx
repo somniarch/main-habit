@@ -37,7 +37,7 @@ export function AdminLoginForm({ onAdminLogin, onBackToNormal }: AdminLoginFormP
       } else {
         setLoginError(data.message || t('login.error.admin'));
       }
-    } catch (error) {
+    } catch {
       setLoginError("관리자 로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
