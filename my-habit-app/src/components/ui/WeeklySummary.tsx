@@ -51,6 +51,8 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - monOffset);
 
+    console.log(`[Stats] Current date: ${currentDate}, Week start: ${weekStart.toISOString().split('T')[0]}`);
+
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(weekStart);
       d.setDate(weekStart.getDate() + i);
@@ -106,6 +108,8 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
               hDone
           )
         : 0;
+
+      console.log(`[Stats] ${label} (${isoDate}): Total=${total}, Done=${doneCount}, Completion=${totalCompletion}%`);
 
       return {
         name: label,

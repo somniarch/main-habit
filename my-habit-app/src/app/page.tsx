@@ -73,16 +73,23 @@ export default function Page() {
           .filter(r => r.date === iso && r.done)
           .map(r => r.task);
         const count = completed.length;
+        
+        console.log(`[Diary] Day: ${day}, Date: ${iso}, Completed: ${count}, Tasks:`, completed);
+        
         if (count >= 5 && !generated5[day]) {
+          console.log(`[Diary] Generating summary for ${day} (5+ tasks)`);
           setGenerated5(prev => ({ ...prev, [day]: true }));
           setDiaryLoading(true);
           const summary = await generateSummaryAI(iso, completed, language);
+          console.log(`[Diary] Summary for ${day}:`, summary);
           setDiarySummariesAI(prev => ({ ...prev, [iso]: summary }));
           setDiaryLoading(false);
         } else if (count >= 10 && !generated10[day]) {
+          console.log(`[Diary] Generating summary for ${day} (10+ tasks)`);
           setGenerated10(prev => ({ ...prev, [day]: true }));
           setDiaryLoading(true);
           const summary = await generateSummaryAI(day, completed, language);
+          console.log(`[Diary] Summary for ${day}:`, summary);
           setDiarySummariesAI(prev => ({ ...prev, [day]: summary }));
           setDiaryLoading(false);
         }
