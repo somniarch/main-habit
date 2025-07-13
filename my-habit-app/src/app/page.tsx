@@ -89,19 +89,19 @@ export default function Page() {
 
   const handleLogout = () => {
     logout();
-    setToast({ emoji: "👋", message: "로그아웃 되었습니다." });
+    setToast({ emoji: "👋", message: t('message.logout.success') });
   };
 
   const handleAddRoutine = () => {
     if (!isLoggedIn) {
-      alert("로그인 후 이용해주세요.");
+      alert(t('login.required'));
       return;
     }
     addRoutine(currentDate, selectedDay);
   };
 
   const handleToggleDone = async (routineId: number) => {
-    if (!isLoggedIn) return alert("로그인 후 이용해주세요.");
+    if (!isLoggedIn) return alert(t('login.required'));
     
     const updatedRoutine = await toggleDone(routineId);
     if (!updatedRoutine?.done) return;
@@ -123,13 +123,13 @@ export default function Page() {
   };
 
   const handleSetRating = async (routineId: number, rating: number) => {
-    if (!isLoggedIn) return alert("로그인 후 이용해주세요.");
+    if (!isLoggedIn) return alert(t('login.required'));
     await setRating(routineId, rating);
   };
 
   const handleFetchHabitSuggestions = async (routineId: number) => {
     if (!isLoggedIn) {
-      alert("로그인 후 이용해주세요.");
+      alert(t('login.required'));
       return;
     }
     
@@ -144,7 +144,7 @@ export default function Page() {
       setAiHabitSuggestions(suggestions);
       setHabitSuggestionIdx(routineId);
     } catch (error) {
-      setAiHabitError(error instanceof Error ? error.message : "추천 중 오류 발생");
+      setAiHabitError(error instanceof Error ? error.message : t('habit.suggestions.error'));
       setAiHabitSuggestions(habitCandidates.slice(0, 3));
     } finally {
       setAiHabitLoading(false);
@@ -166,7 +166,7 @@ export default function Page() {
   const handleLogin = (userId: string, isAdmin: boolean, userDbId?: number) => {
     login(userId, isAdmin);
     setUserDbId(userDbId);
-    setToast({ emoji: "✅", message: isAdmin ? "관리자 로그인 성공!" : "로그인 성공!" });
+    setToast({ emoji: "✅", message: isAdmin ? t('message.admin.login.success') : t('message.login.success') });
   };
 
   const handlePrevWeek = () => {
@@ -232,11 +232,11 @@ export default function Page() {
           )}
 
           <div className="flex justify-center items-center gap-4">
-            <button aria-label="Previous Week" onClick={handlePrevWeek} className="px-3 py-1 text-lg font-bold">
+            <button aria-label={t('nav.prev.week')} onClick={handlePrevWeek} className="px-3 py-1 text-lg font-bold">
               &lt;
             </button>
             <span className="font-semibold text-lg">{formatWeekLabel(currentDate)}</span>
-            <button aria-label="Next Week" onClick={handleNextWeek} className="px-3 py-1 text-lg font-bold">
+            <button aria-label={t('nav.next.week')} onClick={handleNextWeek} className="px-3 py-1 text-lg font-bold">
               &gt;
             </button>
           </div>

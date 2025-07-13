@@ -41,7 +41,7 @@ export function useRoutines(userId: string, userDbId?: number) {
 
   // 루틴 추가
   const addRoutine = async (currentDate: Date, selectedDay: string) => {
-    if (!userId || !userDbId || !newRoutine.task.trim()) return;
+    if (!userId || !newRoutine.task.trim()) return;
 
     const isoDate = getRealDate(currentDate, selectedDay);
     
@@ -131,7 +131,7 @@ export function useRoutines(userId: string, userDbId?: number) {
 
   // 습관 추가
   const addHabitBetween = async (idx: number, habit: string, currentDate: Date, selectedDay: string) => {
-    if (!userId || !userDbId) return;
+    if (!userId) return;
 
     const isoDate = getRealDate(currentDate, selectedDay);
     

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LoginFormProps {
-  onLogin: (userId: string, isAdmin: boolean) => void;
+  onLogin: (userId: string, isAdmin: boolean, userDbId?: number) => void;
 }
 
 export function LoginForm({ onLogin }: LoginFormProps) {
+  const { t } = useLanguage();
   const [userId, setUserId] = useState("");
   const [userPw, setUserPw] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -35,7 +37,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
   const handleLogin = () => {
     if (!userId.trim() || !userPw.trim()) {
-      setLoginError("아이디와 비밀번호를 모두 입력해주세요.");
+      setLoginError(t('login.error.empty'));
       return;
     }
     if (adminModeActive) {
@@ -43,7 +45,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         onLogin(userId, true);
         setLoginError("");
       } else {
-        setLoginError("관리자 계정이 아닙니다.");
+        setLoginError(t('login.error.admin'));
       }
       return;
     }
@@ -53,18 +55,18 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       onLogin(userId, false);
       setLoginError("");
     } else {
-      setLoginError("등록된 사용자 ID 또는 비밀번호가 올바르지 않습니다.");
+      setLoginError(t('login.error.invalid'));
     }
   };
 
   const handleAddUser = () => {
     if (!newUserId.trim() || !newUserPw.trim()) {
-      setUserAddError("아이디와 비밀번호를 모두 입력해주세요.");
+      setUserAddError(t('register.error.empty'));
       return;
     }
     const users = getRegisteredUsers();
     if (users.find((u) => u.id === newUserId)) {
-      setUserAddError("이미 존재하는 아이디입니다.");
+      setUserAddError(t('register.error.exists'));
       return;
     }
     const updated = [...users, { id: newUserId, pw: newUserPw }];
@@ -76,17 +78,17 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
   return (
     <div className="max-w-sm mx-auto p-6 mt-20 border rounded shadow space-y-4 font-sans">
-      <h2 className="text-xl font-semibold text-center">로그인 해주세요</h2>
+      <h2 className="text-xl font-semibold text-center">{t('login.title')}</h2>
       <input
         type="text"
-        placeholder="아이디"
+        placeholder={t('login.id')}
         value={userId}
         onChange={(e) => setUserId(e.target.value)}
         className="border rounded px-3 py-2 w-full"
       />
       <input
         type="password"
-        placeholder="비밀번호"
+        placeholder={t('login.password')}
         value={userPw}
         onChange={(e) => setUserPw(e.target.value)}
         className="border rounded px-3 py-2 w-full"
@@ -103,44 +105,42 @@ export function LoginForm({ onLogin }: LoginFormProps) {
           }}
           className="text-sm text-blue-600 hover:underline"
         >
-          {adminModeActive ? "일반 로그인 모드로 전환" : "관리자 모드"}
+          {adminModeActive ? t('login.normal.mode') : t('login.admin.mode')}
         </button>
         <button
           onClick={handleLogin}
           className="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700 transition"
         >
-          로그인
+          {t('login.button')}
         </button>
       </div>
 
       {loginError && <p className="text-red-600">{loginError}</p>}
 
-      {adminModeActive && (
-        <div className="mt-4 border rounded p-4 bg-gray-50">
-          <h3 className="font-semibold mb-2">사용자 등록 (관리자 전용)</h3>
-          <input
-            type="text"
-            placeholder="새 사용자 아이디"
-            value={newUserId}
-            onChange={(e) => setNewUserId(e.target.value)}
-            className="border rounded px-3 py-2 w-full mb-2"
-          />
-          <input
-            type="password"
-            placeholder="새 사용자 비밀번호"
-            value={newUserPw}
-            onChange={(e) => setNewUserPw(e.target.value)}
-            className="border rounded px-3 py-2 w-full mb-2"
-          />
-          {userAddError && <p className="text-red-600 mb-2">{userAddError}</p>}
-          <button
-            onClick={handleAddUser}
-            className="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700 transition"
-          >
-            사용자 등록
-          </button>
-        </div>
-      )}
+      <div className="border-t pt-4">
+        <h3 className="font-semibold mb-3">{t('register.new.user')}</h3>
+        <input
+          type="text"
+          placeholder={t('register.new.user.id')}
+          value={newUserId}
+          onChange={(e) => setNewUserId(e.target.value)}
+          className="border rounded px-3 py-2 w-full mb-2"
+        />
+        <input
+          type="password"
+          placeholder={t('register.new.user.password')}
+          value={newUserPw}
+          onChange={(e) => setNewUserPw(e.target.value)}
+          className="border rounded px-3 py-2 w-full mb-2"
+        />
+        <button
+          onClick={handleAddUser}
+          className="bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700 transition"
+        >
+          {t('register.new.user')}
+        </button>
+        {userAddError && <p className="text-red-600 mt-2">{userAddError}</p>}
+      </div>
     </div>
   );
 } 
