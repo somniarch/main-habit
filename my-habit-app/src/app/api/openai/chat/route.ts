@@ -131,8 +131,12 @@ export async function POST(request: NextRequest) {
       const raw = completion.choices[0]?.message?.content ?? "";
       console.log("[API] Raw AI response:", raw);
       
-      // 불필요한 헤더/줄바꿈 제거 (영어/한국어 모두)
-      const withoutHeader = raw.replace(/^\*\*오늘의 일기\*\*\s*\r?\n?/i, "").replace(/^\*\*Today\'s Diary\*\*\s*\r?\n?/i, "");
+      // 불필요한 헤더/줄바꿈 제거 (영어/한국어 모두) - ** 제거
+      const withoutHeader = raw
+        .replace(/^\*\*오늘의 일기\*\*\s*\r?\n?/i, "")
+        .replace(/^\*\*Today\'s Diary\*\*\s*\r?\n?/i, "")
+        .replace(/^\*\*.*?\*\*\s*\r?\n?/g, "") // 모든 **로 감싸진 텍스트 제거
+        .replace(/\*\*.*?\*\*/g, ""); // 문장 중간의 ** 제거
       const summary = withoutHeader.trim();
       console.log("[API] Diary summary response:", summary);
 

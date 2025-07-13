@@ -49,6 +49,8 @@ export default function Page() {
   const [aiHabitError, setAiHabitError] = useState<string | null>(null);
 
   const [diaryLoading, setDiaryLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState<Record<string, string>>({});
 
   // 번역된 요일 배열
   const translatedDays = getTranslatedDays(t);
@@ -441,27 +443,51 @@ export default function Page() {
                 }
                 const diaryDateStr = `${iso}(${selectedDay})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);
+                
+                // 요약이 있으면 자동으로 그림 생성
+                if (summary && summary !== warmSummary(completedTasks)) {
+                  // 그림 자동 생성
+                  useEffect(() => {
+                    if (summary && !generatedImages[iso] && !imageLoading) {
+                      setImageLoading(true);
+                      generateImageAI(summary, tasksForImage)
+                        .then(imageUrl => {
+                          if (imageUrl) {
+                            setGeneratedImages(prev => ({ ...prev, [iso]: imageUrl }));
+                            console.log(`[Diary] Auto-generated image URL:`, imageUrl);
+                          }
+                        })
+                        .catch(error => {
+                          console.error(`[Diary] Auto image generation error:`, error);
+                        })
+                        .finally(() => {
+                          setImageLoading(false);
+                        });
+                    }
+                  }, [summary, tasksForImage, iso]);
+                  
+                  return (
+                    <div key={selectedDay} className="mb-6">
+                      <h3 className="font-semibold">{diaryDateStr}</h3>
+                      <p className="mb-2 whitespace-pre-line">{summary}</p>
+                      {imageLoading && (
+                        <div className="text-center text-lg mt-4">
+                          {language === 'en' ? 'Generating image ... 🎨' : '그림 생성중입니다 ... 🎨'}
+                        </div>
+                      )}
+                      {generatedImages[iso] && (
+                        <div className="mt-4 text-center">
+                          <img src={generatedImages[iso]} alt="Generated diary image" className="mx-auto max-w-full rounded" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                
                 return (
                   <div key={selectedDay} className="mb-6">
                     <h3 className="font-semibold">{diaryDateStr}</h3>
                     <p className="mb-2 whitespace-pre-line">{summary}</p>
-                    {/* 그림 생성 버튼 추가 */}
-                    <button
-                      onClick={async () => {
-                        try {
-                          const imageUrl = await generateImageAI(summary, tasksForImage);
-                          if (imageUrl) {
-                            console.log(`[Diary] Generated image URL:`, imageUrl);
-                            // 이미지 표시 로직 추가 가능
-                          }
-                        } catch (error) {
-                          console.error(`[Diary] Image generation error:`, error);
-                        }
-                      }}
-                      className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      {language === 'en' ? 'Generate Image 🎨' : '그림 생성하기 🎨'}
-                    </button>
                   </div>
                 );
               })()}
