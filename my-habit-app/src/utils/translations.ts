@@ -9,9 +9,9 @@ export const translations = {
     'admin.panel': '관리자 패널',
     
     // 탭
-    'tab.routine': '루틴',
-    'tab.diary': '일기',
-    'tab.weekly': '주간 요약',
+    'tab.routine': '루틴 및 습관',
+    'tab.diary': '오늘 일기',
+    'tab.weekly': '통계',
     
     // 루틴 관련
     'add.routine': '루틴 추가',
@@ -79,9 +79,9 @@ export const translations = {
     'admin.panel': 'Admin Panel',
     
     // Tabs
-    'tab.routine': 'Routine',
-    'tab.diary': 'Diary',
-    'tab.weekly': 'Weekly Summary',
+    'tab.routine': 'Routine & Habits',
+    'tab.diary': 'Today\'s Diary',
+    'tab.weekly': 'Statistics',
     
     // Routine related
     'add.routine': 'Add Routine',
