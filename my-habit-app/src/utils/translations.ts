@@ -72,7 +72,7 @@ export const translations = {
     
     // 로그인 관련
     'login.required': '로그인 후 이용해주세요.',
-    'login.title': '로그인 해주세요',
+    'login.title': '로그인',
     'login.id': '아이디',
     'login.password': '비밀번호',
     'login.button': '로그인',
