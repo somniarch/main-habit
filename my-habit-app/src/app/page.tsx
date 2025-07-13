@@ -330,7 +330,12 @@ export default function Page() {
 
               <div className="mt-6 space-y-4">
                 {(() => {
-                  const routinesOfDay = routines.filter((r) => r.day === selectedDay);
+                  // 현재 주차의 해당 요일만 필터링
+                  const dayIdx = fullDays.indexOf(selectedDay);
+                  const d = new Date(currentDate);
+                  d.setDate(currentDate.getDate() - currentDate.getDay() + (dayIdx + 1));
+                  const iso = d.toISOString().split("T")[0];
+                  const routinesOfDay = routines.filter((r) => r.day === selectedDay && r.date === iso);
                   const items: React.ReactNode[] = [];
                   for (let i = 0; i < routinesOfDay.length; i++) {
                     const routine = routinesOfDay[i];
