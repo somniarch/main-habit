@@ -263,7 +263,7 @@ ${prompt}
     });
 
     // 4) 3~5개만 반환(미만이면 기본 후보 추가)
-    let result = finalSuggestions.slice(0, 5);
+    const result = finalSuggestions.slice(0, 5);
     if (result.length < 3) {
       const defaults = getDefaultHabits(selectedLanguage);
       for (let i = 0; i < defaults.length && result.length < 3; i++) {
