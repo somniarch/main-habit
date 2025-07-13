@@ -49,16 +49,17 @@ export function getDayIndex(selectedDay: string): number {
 }
 
 export function getRealDate(currentDate: Date, selectedDay: string): string {
-  // 요일 기준으로 수정
-  // 선택한 요일이 해당 주의 실제 날짜로 계산되어 저장됨
-  // 7/14 (월)의 루틴은 다른 날짜에서 체크해도 7/14 (월)에 저장됨
-  
-  const dayIdx = getDayIndex(selectedDay);
+  // 선택한 요일에 맞춰 해당 주의 실제 날짜를 계산한다.
+  // JS의 getDay는 일요일을 0으로 반환하므로 월요일 기준으로 보정한다.
+
+  const dayIdx = getDayIndex(selectedDay); // 월=0 ~ 일=6
   const realDate = new Date(currentDate);
-  
-  // 현재 주의 해당 요일로 계산
-  realDate.setDate(currentDate.getDate() - currentDate.getDay() + (dayIdx + 1));
-  
+
+  // 현재 날짜가 속한 주의 월요일을 구한 뒤 요일 인덱스를 더한다
+  const jsDay = currentDate.getDay(); // 일=0, 월=1...
+  const monOffset = (jsDay + 6) % 7; // 월요일 기준 오프셋
+  realDate.setDate(currentDate.getDate() - monOffset + dayIdx);
+
   return realDate.toISOString().split("T")[0];
 }
 

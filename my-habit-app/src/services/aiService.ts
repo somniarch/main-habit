@@ -4,7 +4,7 @@ export async function fetchHabitSuggestions(
   language: string = 'ko'
 ): Promise<string[]> {
   try {
-    const res = await fetch("/api/openai/chat", {
+    const res = await fetch("/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prevTask, nextTask, language }),
@@ -41,7 +41,7 @@ export async function fetchHabitSuggestions(
 
 export async function generateSummaryAI(day: string, tasks: string[], language: string = 'ko'): Promise<string> {
   try {
-    const res = await fetch("/api/openai/chat", {
+    const res = await fetch("/openai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: tasks.join(", "), language }),
@@ -71,7 +71,7 @@ The drawing should evoke quiet satisfaction and mindfulness.
 🎯 Focus on: ${promptBase}
 📝 Activities today: ${activities}
 `;
-    const res = await fetch("/api/openai/generate-image", {
+    const res = await fetch("/openai/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),

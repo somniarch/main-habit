@@ -11,22 +11,31 @@ ${tasks}
 사용자의 노력을 진심으로 칭찬하며 따뜻하고 생동감 있는 일기 형식으로 짧게 요약해 주세요.`
     },
     habit: {
-      system: "당신은 웰빙 습관 추천 전문가입니다.",
+      system: "당신은 웰빙 습관 추천 전문가입니다. 앞뒤 행동을 분석하여 적절한 웰빙 습관을 추천합니다.",
       user: (context: string) => `사용자의 이전 행동과 다음 행동: ${context}
-이 행동들 사이에 자연스럽게 연결할 수 있는 짧은 웰빙 습관을
-1) 형식: N분(1~5분) + 활동 + 이모지
-2) 공백 포함 12자 이내
-3) 3개 이상 5개 이하
-4) 리스트 기호, 설명 등 불필요한 요소 없음
-5) 활동은 모두 한국어 명사형으로만 작성
-예시: 3분 스트레칭💪`
+
+이 두 행동 사이에 자연스럽게 연결할 수 있는 웰빙 습관을 추천해 주세요.
+
+**형식 규칙:**
+- N분(1~5분) + 명사형 웰빙 습관 + 관련 이모지
+- 예시: "3분 스트레칭💪", "2분 명상🧘‍♂️", "1분 물마시기💧"
+- 각 습관은 5분 이내여야 함
+- 반드시 명사형으로 작성
+- 관련된 이모지 포함
+- 설명 없이 목록만 출력
+
+**출력 예시:**
+3분 스트레칭💪
+2분 명상🧘‍♂️
+1분 물마시기💧
+4분 산책🚶‍♀️`
     },
-    defaultHabits: ["3분 스트레칭", "2분 숨쉬기", "1분 정리"],
+    defaultHabits: ["3분 스트레칭💪", "2분 명상🧘‍♂️", "1분 물마시기💧"],
     emojiMap: {
       '걷기': '🚶‍♀️',
       '숨쉬기': '🌬️',
       '명상': '🧘‍♂️',
-      '스트레칭': '🤸‍♀️',
+      '스트레칭': '💪',
       '물 마시기': '💧',
       '음악 감상': '🎶',
       'default': '✨'
@@ -42,22 +51,31 @@ Please write a brief, warm and vivid diary entry that captures the meaningful mo
 sincerely praising the user's efforts. Keep it concise and engaging.`
     },
     habit: {
-      system: "You are a wellness habit recommendation expert.",
+      system: "You are a wellness habit recommendation expert. Analyze the context between activities and recommend appropriate wellness habits.",
       user: (context: string) => `User's previous and next activities: ${context}
-Please suggest short wellness habits that can naturally connect between these activities:
-1) Format: N minutes (1-5 min) + activity + emoji
-2) Within 12 characters including spaces
-3) 3-5 suggestions
-4) No list symbols, explanations, or unnecessary elements
-5) Activities should be in English noun form only
-Example: 3min stretching💪`
+
+Please suggest wellness habits that can naturally connect between these activities.
+
+**Format Rules:**
+- N minutes (1-5 min) + noun wellness habit + related emoji
+- Examples: "3min stretching💪", "2min meditation🧘‍♂️", "1min water💧"
+- Each habit must take 5 minutes or less
+- Must be in noun form
+- Include related emoji
+- Output as plain list only
+
+**Output Example:**
+3min stretching💪
+2min meditation🧘‍♂️
+1min water💧
+4min walking🚶‍♀️`
     },
-    defaultHabits: ["3min stretching", "2min breathing", "1min organizing"],
+    defaultHabits: ["3min stretching💪", "2min meditation🧘‍♂️", "1min water💧"],
     emojiMap: {
       'walking': '🚶‍♀️',
       'breathing': '🌬️',
       'meditation': '🧘‍♂️',
-      'stretching': '🤸‍♀️',
+      'stretching': '💪',
       'drinking water': '💧',
       'music': '🎶',
       'default': '✨'

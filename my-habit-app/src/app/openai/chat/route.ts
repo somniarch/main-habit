@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     const userPrompt =
       selectedLanguage === 'en'
         ? `${context}\nSuggest 3-5 wellness habits that can be done between these activities.\n- Format: Nmin + noun + emoji (e.g. 3min stretching💪)\n- Each habit must take 5 minutes or less.\n- Each must be a noun phrase with an emoji.\n- Each must be 16 characters or less.\n- Output as a plain list, no explanations.`
-        : `${context}\n이 두 행동 사이에 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사+이모지 형태여야 합니다.\n- 각 항목은 16자 이내여야 합니다.\n- 설명 없이 목록만 출력해 주세요.`;
+        : `${context}\n이 두 행동 사이에 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사형+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사형으로 작성해 주세요.\n- 관련된 이모지를 포함해 주세요.\n- 설명 없이 목록만 출력해 주세요.`;
     const { system } = getPrompt(selectedLanguage, 'habit', context);
 
     const completion = await openai.chat.completions.create({
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     console.log("[Habit API] After cleaning:", suggestions);
 
-    // 더 유연한 필터링: N분(1~5분) + 명사 + 이모지 (선택적)
+    // 더 유연한 필터링: N분(1~5분) + 명사형 + 이모지 (선택적)
     const filteredSuggestions = suggestions.filter(line => {
       const emojiRegex = /\p{Emoji}/u;
       const minPattern = selectedLanguage === 'en' ? /^(1|2|3|4|5)min/ : /^(1|2|3|4|5)분/;
