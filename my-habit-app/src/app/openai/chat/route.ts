@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
       console.log("[API] Diary summary response:", summary);
 
       return new NextResponse(
-        JSON.stringify({ result: summary }),
+        JSON.stringify({ success: true, result: summary }),
         {
           status: 200,
           headers: {
@@ -165,7 +165,7 @@ ${prompt}
   console.log("[API] Diary summary response:", summary);
 
   return new NextResponse(
-    JSON.stringify({ result: summary }),
+    JSON.stringify({ success: true, result: summary }),
     {
       status: 200,
       headers: {
@@ -284,7 +284,7 @@ ${prompt}
 
     // JSON 형태로 반환
     return new NextResponse(
-      JSON.stringify({ result }),
+      JSON.stringify({ success: true, result }),
       {
         status: 200,
         headers: {
