@@ -7,19 +7,16 @@ import { RoutineForm } from "@/components/routine/RoutineForm";
 import { RoutineItem } from "@/components/routine/RoutineItem";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoutines } from "@/hooks/useRoutines";
-import { formatWeekLabel, formatMonthDay, fullDays } from "@/utils/dateUtils";
+import { formatWeekLabel, formatMonthDay, fullDays, getTranslatedDays } from "@/utils/dateUtils";
 import { getEncouragementAndHabit, warmSummary, habitCandidates } from "@/utils/encouragementUtils";
 import { fetchHabitSuggestions, generateSummaryAI } from "@/services/aiService";
 import { TabType, DiaryLogs, DiarySummaries, GeneratedFlags } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/ui/LanguageSelector";
 
-const dayLetters = fullDays.map((d) => d[0]);
-
 export default function Page() {
   const { isLoggedIn, isAdmin, userId, login, logout } = useAuth();
   const { t, language } = useLanguage();
-  const [userDbId, setUserDbId] = useState<number | undefined>();
   
   const { 
     routines, 
@@ -29,7 +26,7 @@ export default function Page() {
     toggleDone, 
     setRating, 
     addHabitBetween 
-  } = useRoutines(userId, userDbId);
+  } = useRoutines(userId);
 
   const [toast, setToast] = useState<{ message: string; emoji: string } | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -50,6 +47,10 @@ export default function Page() {
   const [aiHabitSuggestions, setAiHabitSuggestions] = useState<string[]>([]);
   const [aiHabitLoading, setAiHabitLoading] = useState(false);
   const [aiHabitError, setAiHabitError] = useState<string | null>(null);
+
+  // 번역된 요일 배열
+  const translatedDays = getTranslatedDays(t);
+  const dayLetters = translatedDays.map((d) => d[0]);
 
   // 로컬 스토리지 저장
   useEffect(() => {
@@ -163,9 +164,8 @@ export default function Page() {
     setAiHabitError(null);
   };
 
-  const handleLogin = (userId: string, isAdmin: boolean, userDbId?: number) => {
+  const handleLogin = (userId: string, isAdmin: boolean) => {
     login(userId, isAdmin);
-    setUserDbId(userDbId);
     setToast({ emoji: "✅", message: isAdmin ? t('message.admin.login.success') : t('message.login.success') });
   };
 
@@ -250,7 +250,7 @@ export default function Page() {
                   className={`rounded-full w-8 h-8 flex items-center justify-center font-semibold ${
                     selectedDay === fullDays[idx] ? "bg-black text-white" : "bg-gray-300 text-black"
                   }`}
-                  aria-label={fullDays[idx]}
+                  aria-label={translatedDays[idx]}
                 >
                   {letter}
                 </button>

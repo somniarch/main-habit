@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LoginFormProps {
-  onLogin: (userId: string, isAdmin: boolean, userDbId?: number) => void;
+  onLogin: (userId: string, isAdmin: boolean) => void;
 }
 
 export function LoginForm({ onLogin }: LoginFormProps) {

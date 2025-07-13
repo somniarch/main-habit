@@ -1,5 +1,20 @@
 const fullDays = ["월", "화", "수", "목", "금", "토", "일"];
 
+export const fullDayKeys = [
+  'day.short.monday',
+  'day.short.tuesday',
+  'day.short.wednesday',
+  'day.short.thursday',
+  'day.short.friday',
+  'day.short.saturday',
+  'day.short.sunday',
+] as const;
+
+// 번역된 요일 배열을 반환하는 함수
+export function getTranslatedDays(t: (key: string) => string) {
+  return fullDayKeys.map(key => t(key));
+}
+
 export function formatWeekLabel(date: Date) {
   // 월별 주차 계산
   const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);

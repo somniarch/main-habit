@@ -2,6 +2,7 @@
 "use client";
 import React, { useMemo } from "react";
 import dynamic from "next/dynamic";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ResponsiveContainer = dynamic(
   () => import("recharts").then((m) => m.ResponsiveContainer),
@@ -16,8 +17,16 @@ const XAxis = dynamic(() => import("recharts").then((m) => m.XAxis), { ssr: fals
 const YAxis = dynamic(() => import("recharts").then((m) => m.YAxis), { ssr: false });
 const Tooltip = dynamic(() => import("recharts").then((m) => m.Tooltip), { ssr: false });
 
-// x축 레이블: 월~일
-const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"] as const;
+// x축 레이블: 월~일 → 번역 키 사용
+const DAY_LABEL_KEYS = [
+  'day.short.monday',
+  'day.short.tuesday',
+  'day.short.wednesday',
+  'day.short.thursday',
+  'day.short.friday',
+  'day.short.saturday',
+  'day.short.sunday',
+] as const;
 
 interface Routine {
   date: string;    // "YYYY-MM-DD" 형식, 스케줄된 날짜
@@ -32,6 +41,7 @@ interface Props {
 }
 
 export default function WeeklySummary({ routines, currentDate }: Props) {
+  const { t } = useLanguage();
   const weeklyData = useMemo(() => {
     const [yy, mm, dd] = currentDate.split("-").map(Number);
     const today = new Date(yy, mm - 1, dd);
@@ -49,7 +59,7 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
       const M = String(d.getMonth() + 1).padStart(2, "0");
       const D = String(d.getDate()).padStart(2, "0");
       const isoDate = `${Y}-${M}-${D}`;
-      const label = DAY_LABELS[i];
+      const label = t(DAY_LABEL_KEYS[i]);
 
       const items = routines.filter((r) => r.date === isoDate);
       const total = items.length;
@@ -106,23 +116,23 @@ export default function WeeklySummary({ routines, currentDate }: Props) {
         habitSatisfaction,
       };
     });
-  }, [routines, currentDate]);
+  }, [routines, currentDate, t]);
 
-  // [라벨, 데이터키, 타입]
+  // [라벨, 데이터키, 타입] → 번역 키 사용
   const charts = [
-    ["전체 달성률", "totalCompletion", "percent"],
-    ["루틴 달성률", "routineCompletion", "percent"],
-    ["습관 달성률", "habitCompletion", "percent"],
-    ["전체 만족도", "totalSatisfaction", "score"],
-    ["루틴 만족도", "routineSatisfaction", "score"],
-    ["습관 만족도", "habitSatisfaction", "score"],
+    [t('chart.total.completion'), "totalCompletion", "percent"],
+    [t('chart.routine.completion'), "routineCompletion", "percent"],
+    [t('chart.habit.completion'), "habitCompletion", "percent"],
+    [t('chart.total.satisfaction'), "totalSatisfaction", "score"],
+    [t('chart.routine.satisfaction'), "routineSatisfaction", "score"],
+    [t('chart.habit.satisfaction'), "habitSatisfaction", "score"],
   ] as const;
 
   return (
     <div className="grid grid-cols-3 gap-4">
       {charts.map(([label, key, type]) => (
         <div key={key} className="space-y-1">
-          <h4 className="text-center font-medium">{`주간 ${label}`}</h4>
+          <h4 className="text-center font-medium">{`${t('chart.weekly.prefix')} ${label}`}</h4>
           <div className="w-full h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>

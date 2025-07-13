@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Routine, NewRoutine } from "@/types";
 import { getRealDate } from "@/utils/dateUtils";
 
-export function useRoutines(userId: string, userDbId?: number) {
+export function useRoutines(userId: string) {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
