@@ -192,7 +192,18 @@ ${prompt}
     // 조합된 컨텍스트 생성
     const sanitizedPrevTask = prevTask ? sanitizeText(prevTask) : "";
     const sanitizedNextTask = nextTask ? sanitizeText(nextTask) : "";
-    const context = [sanitizedPrevTask, sanitizedNextTask].filter(Boolean).join(", ");
+    let context = "";
+    if (selectedLanguage === 'en') {
+      context = [
+        sanitizedPrevTask ? `Previous: ${sanitizedPrevTask}` : "",
+        sanitizedNextTask ? `Next: ${sanitizedNextTask}` : ""
+      ].filter(Boolean).join(", ");
+    } else {
+      context = [
+        sanitizedPrevTask ? `이전: ${sanitizedPrevTask}` : "",
+        sanitizedNextTask ? `다음: ${sanitizedNextTask}` : ""
+      ].filter(Boolean).join(", ");
+    }
     const { system, user } = getPrompt(selectedLanguage, 'habit', context);
 
     const completion = await openai.chat.completions.create({
@@ -208,7 +219,7 @@ ${prompt}
     const text = completion.choices[0]?.message?.content?.trim() ?? "";
     console.log("[Habit API] OpenAI raw response:", text);
 
-    // 1) 번호·불릿 제거, 'N분 활동' 패턴만 남기기
+    // 1) 번호·불릿 제거, 언어별 패턴만 남기기
     let suggestions = text
       .split(/\r?\n+/)
       .map(line =>
@@ -216,31 +227,64 @@ ${prompt}
           .replace(/^\s*\d+[\.\)]\s*/, "")   // "1. " 또는 "2) " 제거
           .replace(/^[-*]\s*/, "")          // 불릿 제거
           .trim()
-       )
-      .filter(line => /^\d+분\s[가-힣]+.*$/u.test(line));
+      )
+      .filter(line => {
+        if (selectedLanguage === 'en') {
+          // 영어: 'Nmin activity' + 이모지
+          return /^\d+min\s[a-zA-Z ]+.*$/u.test(line);
+        } else {
+          // 한글: 'N분 활동' + 이모지
+          return /^\d+분\s[가-힣]+.*$/u.test(line);
+        }
+      });
 
-    // 2) 결과가 없으면 기본 후보로 대체 (최소 3개)
-    if (suggestions.length === 0) {
-      suggestions = getDefaultHabits(selectedLanguage);
-    }
+    // 2) 12자(영어는 12자, 한글은 12글자) 이하만 남기기
+    suggestions = suggestions.filter(line => {
+      if (selectedLanguage === 'en') {
+        // 영어는 공백 포함 12자 이하
+        return line.replace(/\s/g, '').length <= 12;
+      } else {
+        // 한글은 공백 포함 12글자 이하
+        return line.replace(/\s/g, '').length <= 12;
+      }
+    });
 
-    // 3) 이모지가 없는 항목엔 키워드 기반 디폴트 이모지 붙이기
+    // 3) 이모지 없는 항목엔 반드시 이모지 부여
     const emojiMap = getEmojiMap(selectedLanguage);
+    const emojiRegex = /\p{Emoji}/u;
     const finalSuggestions = suggestions.map(item => {
-      if (/\p{Emoji}/u.test(item)) return item;
+      if (emojiRegex.test(item)) return item;
       for (const [key, emoji] of Object.entries(emojiMap)) {
-        if (key !== 'default' && item.includes(key)) {
+        if (key !== 'default' && item.toLowerCase().includes(key.toLowerCase())) {
           return `${item}${emoji}`;
         }
       }
       return `${item}${emojiMap.default}`;
     });
 
-    console.log("[Habit API] Final suggestions:", finalSuggestions);
+    // 4) 3~5개만 반환(미만이면 기본 후보 추가)
+    let result = finalSuggestions.slice(0, 5);
+    if (result.length < 3) {
+      const defaults = getDefaultHabits(selectedLanguage);
+      for (let i = 0; i < defaults.length && result.length < 3; i++) {
+        // 이모지 붙이기
+        let d = defaults[i];
+        if (!emojiRegex.test(d)) {
+          for (const [key, emoji] of Object.entries(emojiMap)) {
+            if (key !== 'default' && d.toLowerCase().includes(key.toLowerCase())) {
+              d = `${d}${emoji}`;
+              break;
+            }
+          }
+          if (!emojiRegex.test(d)) d = `${d}${emojiMap.default}`;
+        }
+        if (!result.includes(d)) result.push(d);
+      }
+    }
 
     // JSON 형태로 반환
     return new NextResponse(
-      JSON.stringify({ result: finalSuggestions }),
+      JSON.stringify({ result }),
       {
         status: 200,
         headers: {

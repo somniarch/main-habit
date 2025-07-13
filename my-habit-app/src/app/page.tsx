@@ -98,13 +98,13 @@ export default function Page() {
       alert(t('login.required'));
       return;
     }
-    addRoutine(currentDate, selectedDay);
+    addRoutine(currentDate, selectedDay); // 이미 선택한 날짜로 추가
   };
 
   const handleToggleDone = async (routineId: number) => {
     if (!isLoggedIn) return alert(t('login.required'));
-    
-    const updatedRoutine = await toggleDone(routineId);
+    // 선택한 날짜와 요일 기준으로 해당 루틴을 찾아서 업데이트
+    const updatedRoutine = await toggleDone(routineId, currentDate, selectedDay);
     if (!updatedRoutine?.done) return;
 
     const { emoji, msg } = getEncouragementAndHabit(updatedRoutine.task);
@@ -112,11 +112,11 @@ export default function Page() {
     setHabitSuggestionIdx(routines.findIndex(r => r.id === routineId));
 
     setTodayDiaryLogs((prev) => {
-      const dayLogs = prev[updatedRoutine.day] || [];
+      const dayLogs = prev[selectedDay] || [];
       if (!dayLogs.includes(updatedRoutine.task)) {
         return {
           ...prev,
-          [updatedRoutine.day]: [...dayLogs, updatedRoutine.task],
+          [selectedDay]: [...dayLogs, updatedRoutine.task],
         };
       }
       return prev;
@@ -125,7 +125,7 @@ export default function Page() {
 
   const handleSetRating = async (routineId: number, rating: number) => {
     if (!isLoggedIn) return alert(t('login.required'));
-    await setRating(routineId, rating);
+    await setRating(routineId, rating, currentDate, selectedDay);
   };
 
   const handleFetchHabitSuggestions = async (routineId: number | string) => {
@@ -166,11 +166,11 @@ export default function Page() {
 
   const handleLogin = (userId: string, isAdmin: boolean) => {
     login(userId, isAdmin);
-    // 로그인 시 오늘 날짜/요일로 이동
+    // 로그인 시 오늘 날짜/요일로 이동 (명확하게 보장)
     const today = new Date();
     setCurrentDate(today);
-    const todayIdx = today.getDay() - 1; // 일요일=0, 월=1...
-    setSelectedDay(fullDays[todayIdx >= 0 ? todayIdx : 6]);
+    const todayIdx = today.getDay(); // 일요일=0, 월=1...
+    setSelectedDay(fullDays[todayIdx === 0 ? 6 : todayIdx - 1]);
     setToast({ emoji: "✅", message: isAdmin ? t('message.admin.login.success') : t('message.login.success') });
   };
 

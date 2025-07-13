@@ -46,16 +46,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { prompt } = await request.json();
-    if (!prompt) {
-      return new NextResponse(JSON.stringify({ error: "No prompt provided" }), {
-        status: 400,
-        headers: corsHeaders
-      });
+    const { prompt, language = 'ko', activities = [] } = await request.json();
+
+    // 언어별 프롬프트 생성
+    let finalPrompt = '';
+    if (language === 'en') {
+      finalPrompt = `A warm, cozy colored pencil illustration with soft textures and subtle shading, resembling hand-drawn diary art.\nGentle, muted colors like orange, yellow, brown, and green.\nThe composition should feel peaceful and heartwarming, like a moment captured in a personal journal.\nNo humans should appear in the image.\nThe drawing should evoke quiet satisfaction and mindfulness.\n\nFocus on: ${prompt}\nActivities today: ${activities.join(', ')}`;
+    } else {
+      finalPrompt = `따뜻하고 포근한 색연필 느낌의 일러스트, 부드러운 질감과 은은한 명암, 손그림 일기 느낌.\n오렌지, 노랑, 갈색, 연두 등 부드러운 색상.\n구성은 평화롭고 마음이 따뜻해지는, 일기장에 기록된 한 장면처럼.\n사람은 등장하지 않음.\n그림은 조용한 만족감과 마음챙김을 느끼게 해야 함.\n\n중점: ${prompt}\n오늘의 활동: ${activities.join(', ')}`;
     }
 
-    // 프롬프트 정리
-    const cleanPrompt = sanitizeString(prompt);
+    const cleanPrompt = sanitizeString(finalPrompt);
 
     const response = await openai.images.generate({
       prompt: cleanPrompt,

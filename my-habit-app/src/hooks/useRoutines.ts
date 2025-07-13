@@ -77,9 +77,14 @@ export function useRoutines(userId: string) {
   };
 
   // 루틴 완료 상태 토글
-  const toggleDone = async (routineId: number) => {
+  const toggleDone = async (routineId: number, currentDate?: Date, selectedDay?: string) => {
     try {
-      const routine = routines.find(r => r.id === routineId);
+      let routine = routines.find(r => r.id === routineId);
+      // 날짜/요일이 주어지면 해당 날짜/요일의 루틴만 찾기
+      if (currentDate && selectedDay) {
+        const isoDate = getRealDate(currentDate, selectedDay);
+        routine = routines.find(r => r.id === routineId && r.date === isoDate && r.day === selectedDay) || routine;
+      }
       if (!routine) return;
 
       const response = await fetch("/api/routines", {
@@ -107,8 +112,15 @@ export function useRoutines(userId: string) {
   };
 
   // 루틴 평점 설정
-  const setRating = async (routineId: number, rating: number) => {
+  const setRating = async (routineId: number, rating: number, currentDate?: Date, selectedDay?: string) => {
     try {
+      let routine = routines.find(r => r.id === routineId);
+      if (currentDate && selectedDay) {
+        const isoDate = getRealDate(currentDate, selectedDay);
+        routine = routines.find(r => r.id === routineId && r.date === isoDate && r.day === selectedDay) || routine;
+      }
+      if (!routine) return;
+
       const response = await fetch("/api/routines", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
