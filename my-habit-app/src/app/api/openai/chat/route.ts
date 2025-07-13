@@ -148,10 +148,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2) 습관 추천 분기: prevTask와 nextTask가 모두 있을 때만
-    if (!prevTask || !nextTask) {
+    // 2) 습관 추천 분기: nextTask는 필수, prevTask는 선택적
+    if (!nextTask) {
       return new NextResponse(
-        JSON.stringify({ error: "이전 작업과 다음 작업이 모두 필요합니다 (prevTask, nextTask required)" }),
+        JSON.stringify({ error: "다음 작업이 필요합니다 (nextTask required)" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
@@ -161,26 +161,28 @@ export async function POST(request: NextRequest) {
 
     console.log("[API] Habit recommendation mode. Context:", prevTask, nextTask);
 
-    // 조합된 컨텍스트 생성
+    // 조합된 컨텍스트 생성 - prevTask가 null일 때도 처리
     const sanitizedPrevTask = prevTask ? sanitizeText(prevTask) : "";
-    const sanitizedNextTask = nextTask ? sanitizeText(nextTask) : "";
+    const sanitizedNextTask = sanitizeText(nextTask);
     let context = "";
     if (selectedLanguage === 'en') {
-      context = [
-        sanitizedPrevTask ? `Previous: ${sanitizedPrevTask}` : "",
-        sanitizedNextTask ? `Next: ${sanitizedNextTask}` : ""
-      ].filter(Boolean).join(", ");
+      if (sanitizedPrevTask) {
+        context = `Previous: ${sanitizedPrevTask}, Next: ${sanitizedNextTask}`;
+      } else {
+        context = `Next: ${sanitizedNextTask}`;
+      }
     } else {
-      context = [
-        sanitizedPrevTask ? `이전: ${sanitizedPrevTask}` : "",
-        sanitizedNextTask ? `다음: ${sanitizedNextTask}` : ""
-      ].filter(Boolean).join(", ");
+      if (sanitizedPrevTask) {
+        context = `이전: ${sanitizedPrevTask}, 다음: ${sanitizedNextTask}`;
+      } else {
+        context = `다음: ${sanitizedNextTask}`;
+      }
     }
     // 프롬프트를 더 명확하게 전달 - 엄격한 형식 규칙 적용
     const userPrompt =
       selectedLanguage === 'en'
-        ? `${context}\nSuggest 3-5 wellness habits that can be done between these activities.\n- Format: Nmin + noun + emoji (e.g. 3min stretching💪)\n- Each habit must take 5 minutes or less.\n- Each must be a noun phrase with an emoji.\n- Each must be 16 characters or less.\n- Output as a plain list, no explanations.\n- Strictly follow the format: Nmin + noun + emoji`
-        : `${context}\n이 두 행동 사이에 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사형+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사형으로 작성해 주세요.\n- 관련된 이모지를 포함해 주세요.\n- 설명 없이 목록만 출력해 주세요.\n- 엄격히 다음 형식을 지켜주세요: N분+명사형+이모지`;
+        ? `${context}\nSuggest 3-5 wellness habits that can be done ${prevTask ? 'between these activities' : 'before this activity'}.\n- Format: Nmin + noun + emoji (e.g. 3min stretching💪)\n- Each habit must take 5 minutes or less.\n- Each must be a noun phrase with an emoji.\n- Each must be 16 characters or less.\n- Output as a plain list, no explanations.\n- Strictly follow the format: Nmin + noun + emoji`
+        : `${context}\n${prevTask ? '이 두 행동 사이에' : '이 행동 전에'} 할 수 있는 3~5개의 웰빙 습관을 추천해 주세요.\n- 형식: N분+명사형+이모지 (예: 3분 스트레칭💪)\n- 각 습관은 5분 이내여야 합니다.\n- 반드시 명사형으로 작성해 주세요.\n- 관련된 이모지를 포함해 주세요.\n- 설명 없이 목록만 출력해 주세요.\n- 엄격히 다음 형식을 지켜주세요: N분+명사형+이모지`;
     const { system } = getPrompt(selectedLanguage, 'habit', context);
 
     const completion = await openai.chat.completions.create({
