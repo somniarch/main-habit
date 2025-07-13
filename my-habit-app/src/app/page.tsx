@@ -49,7 +49,6 @@ export default function Page() {
   const [aiHabitError, setAiHabitError] = useState<string | null>(null);
 
   const [diaryLoading, setDiaryLoading] = useState(false);
-  const [imageLoading, setImageLoading] = useState(false);
 
   // 번역된 요일 배열
   const translatedDays = getTranslatedDays(t);
@@ -399,9 +398,6 @@ export default function Page() {
                 // 로딩 상태 분리 (예시: diaryLoading, imageLoading)
                 if (diaryLoading) {
                   return <div className="text-center text-lg">{language === 'en' ? 'Writing diary summary ... 📝' : '일기 요약 작성중입니다 ... 📝'}</div>;
-                }
-                if (imageLoading) {
-                  return <div className="text-center text-lg">{language === 'en' ? 'Drawing diary image ... 🖼️' : '일기 그림 그리는 중입니다 ... 🖼️'}</div>;
                 }
                 const diaryDateStr = `${iso}(${selectedDay})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);

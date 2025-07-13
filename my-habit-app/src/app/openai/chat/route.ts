@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
     console.log("[Habit API] OpenAI raw response:", text);
 
     // 1) 번호·불릿 제거, 패턴 필터링
-    let suggestions = text
+    const suggestions = text
       .split(/\r?\n+/)
       .map(line =>
         line
