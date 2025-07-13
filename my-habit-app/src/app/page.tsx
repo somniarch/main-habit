@@ -34,7 +34,6 @@ export default function Page() {
 
   const [toast, setToast] = useState<{ message: string; emoji: string } | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [weekNum, setWeekNum] = useState(1);
   const [selectedDay, setSelectedDay] = useState(fullDays[0]);
   const [selectedTab, setSelectedTab] = useState<TabType>("routine-habit");
 
@@ -173,12 +172,10 @@ export default function Page() {
   };
 
   const handlePrevWeek = () => {
-    setWeekNum((w) => Math.max(1, w - 1));
     setCurrentDate(new Date(currentDate.getTime() - 7 * 86400000));
   };
 
   const handleNextWeek = () => {
-    setWeekNum((w) => w + 1);
     setCurrentDate(new Date(currentDate.getTime() + 7 * 86400000));
   };
 
@@ -240,7 +237,7 @@ export default function Page() {
             <button aria-label="Previous Week" onClick={handlePrevWeek} className="px-3 py-1 text-lg font-bold">
               &lt;
             </button>
-            <span className="font-semibold text-lg">{formatWeekLabel(currentDate, weekNum)}</span>
+            <span className="font-semibold text-lg">{formatWeekLabel(currentDate)}</span>
             <button aria-label="Next Week" onClick={handleNextWeek} className="px-3 py-1 text-lg font-bold">
               &gt;
             </button>
