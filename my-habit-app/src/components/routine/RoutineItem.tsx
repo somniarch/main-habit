@@ -22,7 +22,12 @@ export function RoutineItem({
       <div className="border rounded p-4 flex justify-between items-center">
         <div>
           <span className="font-semibold">
-            [{formatTimeWithPeriod(routine.start, language)} - {formatTimeWithPeriod(routine.end, language)}] {routine.task}
+            {routine.isHabit
+              ? language === 'en'
+                ? '[Well-being Habit]'
+                : '[웰빙 습관]'
+              : `[${formatTimeWithPeriod(routine.start, language)} - ${formatTimeWithPeriod(routine.end, language)}]`}
+            {' '}{routine.task}
           </span>
           {routine.done && <span className="ml-2 text-green-600 font-semibold">✔</span>}
         </div>
