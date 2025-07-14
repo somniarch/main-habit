@@ -38,18 +38,29 @@ export function RoutineItem({
         />
       </div>
       {routine.done && (
-        <div className="mt-1 flex gap-1 flex-wrap">
-          {[...Array(10).keys()].map((n) => (
-            <button
-              key={n}
-              className={`px-2 rounded ${
-                routine.rating === n + 1 ? "bg-black text-white" : "bg-gray-300 text-black"
-              }`}
-              onClick={() => onSetRating(globalIndex, n + 1)}
-            >
-              {n + 1}
-            </button>
-          ))}
+        <div className="mt-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-sm font-medium text-gray-700">{language === 'en' ? 'Satisfaction' : '만족도'}</span>
+            <div className="flex-1 flex items-center justify-between ml-4">
+              <span className="text-xs text-gray-500">{language === 'en' ? 'Very Dissatisfied' : '매우 불만족'}</span>
+              <span className="text-xs text-gray-500">{language === 'en' ? 'Very Satisfied' : '매우 만족'}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 w-full">
+            <span className="invisible">0</span>
+            {[...Array(10).keys()].map((n) => (
+              <button
+                key={n}
+                className={`px-2 rounded transition h-8 w-8 text-sm font-semibold ${
+                  routine.rating === n + 1 ? "bg-black text-white" : "bg-gray-300 text-black hover:bg-gray-400"
+                }`}
+                onClick={() => onSetRating(globalIndex, n + 1)}
+              >
+                {n + 1}
+              </button>
+            ))}
+            <span className="invisible">11</span>
+          </div>
         </div>
       )}
     </React.Fragment>
