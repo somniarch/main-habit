@@ -144,7 +144,7 @@ export default function Page() {
     if (!updatedRoutine?.done) return;
 
     const { emoji, msg } = getEncouragementAndHabit(updatedRoutine.task);
-    setToast({ emoji, message: `${msg} "${updatedRoutine.task}"!` });
+    setToast({ emoji, message: `${t('message.task.completed')} "${updatedRoutine.task}"!` });
     setHabitSuggestionIdx(routines.findIndex(r => r.id === routineId));
 
     setTodayDiaryLogs((prev) => {
@@ -447,8 +447,16 @@ export default function Page() {
                   return <div className="text-center text-lg">{language === 'en' ? 'Writing diary summary ... 📝' : '일기 요약 작성중입니다 ... 📝'}</div>;
                 }
                 // 요일 약어 처리
-                const shortDayKey = `day.short.${selectedDay.toLowerCase()}`;
-                const shortDayLabel = t(shortDayKey);
+                let shortDayLabel = '';
+                if (language === 'en') {
+                  // 영어: Mon, Tue, ...
+                  const enShorts = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                  const idx = ['월','화','수','목','금','토','일'].indexOf(selectedDay);
+                  shortDayLabel = enShorts[idx >= 0 ? idx : 0];
+                } else {
+                  // 한글: 월, 화, ...
+                  shortDayLabel = selectedDay;
+                }
                 const diaryDateStr = `${iso}(${shortDayLabel})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);
                 
