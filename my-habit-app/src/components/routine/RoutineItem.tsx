@@ -44,7 +44,7 @@ export function RoutineItem({
           </div>
           <div className="flex items-center w-full justify-between">
             <span className="text-xs text-gray-500 whitespace-nowrap mr-2">{language === 'en' ? 'Very Dissatisfied' : '매우 불만족'}</span>
-            <div className="flex items-center gap-1 flex-1 justify-center">
+            <div className="flex items-center gap-1 flex-1 justify-center overflow-x-auto flex-nowrap">
               {[...Array(10).keys()].map((n) => (
                 <button
                   key={n}
