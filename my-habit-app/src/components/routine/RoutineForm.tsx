@@ -47,7 +47,7 @@ export function RoutineForm({ newRoutine, onNewRoutineChange, onAddRoutine }: Ro
       />
       <input
         type="text"
-        placeholder={language === 'en' ? 'Routine Add or Habit Suggestions' : '루틴 추가 또는 습관 추천'}
+        placeholder={language === 'en' ? 'Routine Add' : '루틴 추가'}
         value={newRoutine.task}
         onChange={(e) => onNewRoutineChange({ ...newRoutine, task: e.target.value })}
         className="border rounded px-2 py-1"
