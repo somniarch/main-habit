@@ -446,7 +446,10 @@ export default function Page() {
                 if (diaryLoading) {
                   return <div className="text-center text-lg">{language === 'en' ? 'Writing diary summary ... 📝' : '일기 요약 작성중입니다 ... 📝'}</div>;
                 }
-                const diaryDateStr = `${iso}(${t(`day.${selectedDay.toLowerCase()}`)})`;
+                // 요일 약어 처리
+                const shortDayKey = `day.short.${selectedDay.toLowerCase()}`;
+                const shortDayLabel = t(shortDayKey);
+                const diaryDateStr = `${iso}(${shortDayLabel})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);
                 
                 // 요약이 있으면 자동으로 그림 생성

@@ -113,3 +113,15 @@ export function formatTimeWithPeriod(time: string, language: string): string {
     return `${period} ${hour.toString().padStart(2, "0")}:${minute}`;
   }
 } 
+
+export function getEncouragementAndHabit(task: string, language: string) {
+  const lower = task.toLowerCase();
+  if (lower.includes("study") || lower.includes("read")) {
+    return {
+      emoji: "📚",
+      msg: language === "en" ? "Great focus on learning!" : "학습에 집중했네요!",
+      habitSuggestion: language === "en" ? "Take a 5-min brain break" : "5분간 뇌 휴식을 가져보세요",
+    };
+  }
+  // ... 이하 동일하게 영어/한글 분기
+} 
