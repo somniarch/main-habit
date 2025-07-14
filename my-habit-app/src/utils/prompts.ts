@@ -17,9 +17,10 @@ ${tasks}
 - 모든 문장은 완전한 끝맺음 (마침표, 느낌표, 물음표)
 - 따뜻하고 격려적인 톤 유지
 - 구체적인 감정과 경험을 담되 간결하게 작성
+- 존댓말 사용 (합니다, 됩니다, 느껴집니다 등)
 
 **출력 예시:**
-스트레칭을 하면서 몸이 서서히 풀리는 느낌이 너무 좋았다. 운동 시간에는 땀을 흘리며 각별히 느껴지는 성취감이 있었다. 마지막으로 눈 운동을 하며 잠시나마 눈의 피로를 풀어주는 시간을 가졌다.`
+스트레칭을 하면서 몸이 서서히 풀리는 느낌이 너무 좋습니다. 운동 시간에는 땀을 흘리며 각별히 느껴지는 성취감이 있었습니다. 마지막으로 눈 운동을 하며 잠시나마 눈의 피로를 풀어주는 시간을 가졌습니다.`
     },
     habit: {
       system: "당신은 웰빙 습관 추천 전문가입니다. 앞뒤 행동을 분석하여 적절한 웰빙 습관을 추천합니다.",
@@ -74,6 +75,7 @@ sincerely praising the user's efforts. Focus on high-satisfaction activities to 
 - All sentences must have complete endings (period, exclamation, question mark)
 - Maintain warm and encouraging tone
 - Include specific emotions and experiences but keep it concise
+- Use polite and respectful language
 
 **Output Example:**
 Stretching felt amazing as my muscles gradually relaxed. During exercise, I felt a special sense of accomplishment while sweating. Finally, I took time to relieve eye fatigue with eye exercises.`
