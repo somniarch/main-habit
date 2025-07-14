@@ -1,6 +1,3 @@
-import { useLanguage } from "@/contexts/LanguageContext";
-import { formatTimeWithPeriod } from "@/utils/dateUtils";
-
 export async function fetchHabitSuggestions(
   prevTask: string | null,
   nextTask: string | null,
