@@ -387,9 +387,9 @@ export default function Page() {
                             <button
                               onClick={() => handleFetchHabitSuggestions(routineKey)}
                               className="rounded-full bg-gray-300 px-3 py-1 hover:bg-gray-400"
-                              aria-label="습관 추천 열기"
+                              aria-label={t('habit.suggestions.open')}
                             >
-                              + 습관 추천
+                              + {t('habit.suggestions')}
                             </button>
                           )}
                         </div>
@@ -446,7 +446,7 @@ export default function Page() {
                 if (diaryLoading) {
                   return <div className="text-center text-lg">{language === 'en' ? 'Writing diary summary ... 📝' : '일기 요약 작성중입니다 ... 📝'}</div>;
                 }
-                const diaryDateStr = `${iso}(${selectedDay})`;
+                const diaryDateStr = `${iso}(${t(`day.${selectedDay.toLowerCase()}`)})`;
                 const summary = diarySummariesAI[iso] || warmSummary(completedTasks);
                 
                 // 요약이 있으면 자동으로 그림 생성

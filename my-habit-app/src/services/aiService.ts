@@ -70,7 +70,7 @@ export async function generateImageAI(promptBase: string, tasks: string[]): Prom
       ? activities.substring(0, maxActivitiesLength) + "..." 
       : activities;
     
-    const prompt = `Colored pencil drawing style, hand-drawn diary art, soft textures, warm muted colors (orange, yellow, brown, green), peaceful journal illustration, no humans, cozy atmosphere, featuring the single most satisfying completed activity prominently: ${truncatedActivities}`;
+    const prompt = `Colored pencil drawing style, hand-drawn diary art, soft textures, warm muted colors (orange, yellow, brown, green), peaceful journal illustration, no humans, no text, no letters, no words, cozy atmosphere, featuring the single most satisfying completed activity prominently with related objects clearly visible: ${truncatedActivities}`;
     
     // 최종 프롬프트 길이 확인
     if (prompt.length > maxPromptLength) {
