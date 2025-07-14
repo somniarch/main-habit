@@ -1,7 +1,6 @@
 import React from "react";
 import { NewRoutine } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { formatTimeWithPeriod } from "@/utils/dateUtils";
 
 interface RoutineFormProps {
   newRoutine: NewRoutine;
@@ -10,7 +9,7 @@ interface RoutineFormProps {
 }
 
 export function RoutineForm({ newRoutine, onNewRoutineChange, onAddRoutine }: RoutineFormProps) {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   // 시간 placeholder 언어별 처리
   const getTimePlaceholder = (time: string) => {
     if (!time) return '';
