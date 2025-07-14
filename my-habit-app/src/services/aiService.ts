@@ -70,7 +70,7 @@ export async function generateImageAI(promptBase: string, tasks: string[]): Prom
       ? activities.substring(0, maxActivitiesLength) + "..." 
       : activities;
     
-    const prompt = `A warm, cozy colored pencil illustration with soft textures and subtle shading, resembling hand-drawn diary art. Gentle, muted colors like orange, yellow, brown, and green. The composition should feel peaceful and heartwarming, like a moment captured in a personal journal. No humans should appear in the image. The drawing should evoke quiet satisfaction and mindfulness. Focus on the most satisfying and meaningful activities from the user's day. Style: colored pencil drawing, soft textures, diary art style, warm and cozy atmosphere. Activities: ${truncatedActivities}. Create an image that captures the joy and fulfillment from these activities.`;
+    const prompt = `Colored pencil drawing style, hand-drawn diary art, soft textures, warm muted colors (orange, yellow, brown, green), peaceful journal illustration, no humans, cozy atmosphere, activities: ${truncatedActivities}`;
     
     // 최종 프롬프트 길이 확인
     if (prompt.length > maxPromptLength) {
