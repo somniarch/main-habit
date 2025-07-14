@@ -1,17 +1,4 @@
-import { useLanguage } from "@/contexts/LanguageContext";
-import { formatTimeWithPeriod } from "@/utils/dateUtils";
-
-// RoutineForm 내부
-const { language } = useLanguage();
-
-<div>
-  {formatTimeWithPeriod(newRoutine.start, language)}
-</div>
-<input
-  type="time"
-  value={newRoutine.start}
-  ...
-/>
+// RoutineForm 내부, JSX, useLanguage 등 삭제
 
 export async function fetchHabitSuggestions(
   prevTask: string | null,
