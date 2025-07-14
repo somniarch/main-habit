@@ -143,7 +143,7 @@ export default function Page() {
     const updatedRoutine = await toggleDone(routineId, currentDate, selectedDay);
     if (!updatedRoutine?.done) return;
 
-    const { emoji, msg } = getEncouragementAndHabit(updatedRoutine.task);
+    const { emoji } = getEncouragementAndHabit(updatedRoutine.task);
     setToast({ emoji, message: `${t('message.task.completed')} "${updatedRoutine.task}"!` });
     setHabitSuggestionIdx(routines.findIndex(r => r.id === routineId));
 
