@@ -1,3 +1,6 @@
+import { useLanguage } from "@/contexts/LanguageContext";
+import { formatTimeWithPeriod } from "@/utils/dateUtils";
+
 export async function fetchHabitSuggestions(
   prevTask: string | null,
   nextTask: string | null,
@@ -92,5 +95,21 @@ export async function generateImageAI(promptBase: string, tasks: string[]): Prom
   } catch (e) {
     console.error(e);
     return "";
+  }
+} 
+
+export function formatTimeWithPeriod(time: string, language: string): string {
+  // time: "08:00" 또는 "13:00"
+  const [hourStr, minute] = time.split(":");
+  let hour = parseInt(hourStr, 10);
+  let period = "";
+  if (language === "en") {
+    period = hour < 12 ? "AM" : "PM";
+    hour = hour % 12 || 12;
+    return `${period} ${hour.toString().padStart(2, "0")}:${minute}`;
+  } else {
+    period = hour < 12 ? "오전" : "오후";
+    if (hour > 12) hour -= 12;
+    return `${period} ${hour.toString().padStart(2, "0")}:${minute}`;
   }
 } 

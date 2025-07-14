@@ -1,5 +1,7 @@
 import React from "react";
 import { Routine } from "@/types";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { formatTimeWithPeriod } from "@/utils/dateUtils";
 
 interface RoutineItemProps {
   routine: Routine;
@@ -14,12 +16,13 @@ export function RoutineItem({
   onToggleDone,
   onSetRating,
 }: RoutineItemProps) {
+  const { language } = useLanguage();
   return (
     <React.Fragment>
       <div className="border rounded p-4 flex justify-between items-center">
         <div>
           <span className="font-semibold">
-            [{routine.start} - {routine.end}] {routine.task}
+            [{formatTimeWithPeriod(routine.start, language)} - {formatTimeWithPeriod(routine.end, language)}] {routine.task}
           </span>
           {routine.done && <span className="ml-2 text-green-600 font-semibold">✔</span>}
         </div>
